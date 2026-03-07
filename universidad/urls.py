@@ -26,4 +26,9 @@ urlpatterns = [
 path('', views.dashboard, name='dashboard'),
     path('admin/', admin.site.urls),
     path('alumnos/', include('universidad.Models.Alumno.urls')),
+    path('curso/', include('universidad.Models.Curso.urls')),
+    path('catedratico/', include('universidad.Models.catedratico.urls')),
+    path('notas/', include('universidad.Models.Notas.urls')),
+    path('asignacion_curso/', include('universidad.Models.asignacion_curso.urls')),
+    path('inscripcion_alumno/', include('universidad.Models.Inscripcion_alumno.urls'))
 ]

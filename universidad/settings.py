@@ -40,6 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'universidad.Models.Alumno',
+    'universidad.Models.catedratico',
+    'universidad.Models.Curso',
+    'universidad.Models.asignacion_curso',
+    'universidad.Models.Inscripcion_alumno',
+    'universidad.Models.Notas',
     'core'
 ]
 
@@ -83,7 +88,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'universidad',
         'USER': 'root',
-        'PASSWORD': 'root1234',
+        'PASSWORD': 'root',
         'HOST': 'localhost',
         'PORT': '3306',
     }

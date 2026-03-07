@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Notas{% endblock %}
+{% block page_title %}Listado de Calificaciones{% endblock %}
+{% block content %}
+<div class="container mt-3">
+    <a href="{% url 'notas:create' %}" class="btn btn-primary mb-3">Nueva Nota</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Alumno</th>
+                <th>Curso</th>
+                <th>Nota</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for nota in object_list %}
+            <tr>
+                <td>{{ nota.alumno }}</td>
+                <td>{{ nota.curso }}</td>
+                <td>{{ nota.nota }}</td>
+                <td>
+                    <a href="{% url 'notas:update' nota.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'notas:delete' nota.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No hay notas registradas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

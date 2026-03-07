@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Inscripciones{% endblock %}
+{% block page_title %}Listado de Inscripciones de Alumnos{% endblock %}
+{% block content %}
+<div class="container mt-3">
+    <a href="{% url 'inscripcion_alumno:create' %}" class="btn btn-primary mb-3">Nueva Inscripción</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Alumno</th>
+                <th>Curso Asignado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inscripcion in object_list %}
+            <tr>
+                <td>{{ inscripcion.alumno }}</td>
+                <td>{{ inscripcion.asignacion_curso }}</td>
+                <td>
+                    <a href="{% url 'inscripcion_alumno:update' inscripcion.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'inscripcion_alumno:delete' inscripcion.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">No hay inscripciones registradas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

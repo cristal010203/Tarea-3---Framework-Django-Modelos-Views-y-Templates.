@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Cursos{% endblock %}
+{% block page_title %}Listado de Cursos{% endblock %}
+{% block content %}
+<div class="container mt-3">
+    <a href="{% url 'curso:create' %}" class="btn btn-primary mb-3">Nuevo Curso</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for curso in object_list %}
+            <tr>
+                <td>{{ curso.nombre }}</td>
+                <td>{{ curso.descripcion }}</td>
+                <td>
+                    <a href="{% url 'curso:update' curso.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'curso:delete' curso.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">No hay cursos registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

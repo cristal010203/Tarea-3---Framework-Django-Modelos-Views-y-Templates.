@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Catedráticos{% endblock %}
+{% block page_title %}Listado de Catedráticos{% endblock %}
+{% block content %}
+<div class="container mt-3">
+    <a href="{% url 'catedratico:create' %}" class="btn btn-primary mb-3">Nuevo Catedrático</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Especialidad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for catedratico in object_list %}
+            <tr>
+                <td>{{ catedratico.nombre }}</td>
+                <td>{{ catedratico.especialidad }}</td>
+                <td>
+                    <a href="{% url 'catedratico:update' catedratico.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'catedratico:delete' catedratico.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">No hay catedráticos registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

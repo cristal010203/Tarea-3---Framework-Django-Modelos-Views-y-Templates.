@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Asignación de Cursos{% endblock %}
+{% block page_title %}Listado de Asignaciones de Cursos{% endblock %}
+{% block content %}
+<div class="container mt-3">
+    <a href="{% url 'asignacion_curso:create' %}" class="btn btn-primary mb-3">Nueva Asignación</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Curso</th>
+                <th>Catedrático</th>
+                <th>Horario</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asignacion in object_list %}
+            <tr>
+                <td>{{ asignacion.curso }}</td>
+                <td>{{ asignacion.catedratico }}</td>
+                <td>{{ asignacion.horario }}</td>
+                <td>
+                    <a href="{% url 'asignacion_curso:update' asignacion.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'asignacion_curso:delete' asignacion.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No hay asignaciones registradas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

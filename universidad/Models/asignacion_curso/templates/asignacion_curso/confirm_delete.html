@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Eliminar Asignación{% endblock %}
+{% block page_title %}Confirmar Eliminación{% endblock %}
+{% block content %}
+<div class="container mt-3">
+    <p>¿Estás seguro de que deseas eliminar la asignación del curso <strong>{{ object.curso }}</strong> con el catedrático <strong>{{ object.catedratico }}</strong>?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        <a href="{% url 'asignacion_curso:list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

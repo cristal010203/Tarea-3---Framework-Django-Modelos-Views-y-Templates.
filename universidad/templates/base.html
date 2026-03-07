@@ -176,19 +176,37 @@
     </a>
 
     <div class="nav-section">Académico</div>
+
     <a href="{% url 'alumno:list' %}"
-       class="nav-link {% if request.resolver_match.namespace == 'alumno' %}active{% endif %}">
+    class="nav-link {% if request.resolver_match.namespace == 'alumno' %}active{% endif %}">
         <i class="bi bi-people-fill"></i> Alumnos
     </a>
 
-    <!-- Módulos futuros -->
-    <a href="#" class="nav-link">
+    <a href="{% url 'curso:list' %}"
+    class="nav-link {% if request.resolver_match.namespace == 'curso' %}active{% endif %}">
         <i class="bi bi-journal-bookmark-fill"></i> Cursos
     </a>
-    <a href="#" class="nav-link">
+
+    <a href="{% url 'notas:list' %}"
+    class="nav-link {% if request.resolver_match.namespace == 'notas' %}active{% endif %}">
         <i class="bi bi-clipboard2-check-fill"></i> Calificaciones
     </a>
 
+    <a href="{% url 'catedratico:list' %}"
+    class="nav-link {% if request.resolver_match.namespace == 'catedratico' %}active{% endif %}">
+        <i class="bi bi-person-badge-fill"></i> Catedráticos
+    </a>
+
+    <a href="{% url 'asignacion_curso:list' %}"
+    class="nav-link {% if request.resolver_match.namespace == 'asignacion_curso' %}active{% endif %}">
+        <i class="bi bi-calendar-check-fill"></i> Asignación de Cursos
+    </a>
+
+    <a href="{% url 'inscripcion_alumno:list' %}"
+    class="nav-link {% if request.resolver_match.namespace == 'inscripcion_alumno' %}active{% endif %}">
+        <i class="bi bi-person-lines-fill"></i> Inscripción de Alumnos
+    </a>
+    
     <div class="nav-section">Sistema</div>
     <a href="#" class="nav-link">
         <i class="bi bi-gear-fill"></i> Configuración
