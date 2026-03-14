@@ -3,16 +3,18 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Alumno
 from .forms import AlumnoForm
+from django.db.models import Q
 
 def alumno_list(request):
     query   = request.GET.get('q', '')
     alumnos = Alumno.objects.all()
 
     if query:
-        alumnos = alumnos.filter(first_name__icontains=query) \
-                | alumnos.filter(last_name__icontains=query)  \
-                | alumnos.filter(email__icontains=query)
-
+        alumnos = alumnos.filter(
+        Q(first_name__icontains=query) |
+        Q(last_name__icontains=query) |
+        Q(email__icontains=query)
+    )
     return render(request, 'alumno/list.html', {
         'alumnos': alumnos,
         'query':   query

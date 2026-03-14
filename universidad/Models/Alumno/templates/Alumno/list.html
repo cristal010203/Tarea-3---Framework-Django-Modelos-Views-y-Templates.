@@ -1,3 +1,4 @@
+# agregar libreria en el template para trabajar iconos 
 {% extends 'base.html' %}
 {% block title %}Alumnos{% endblock %}
 {% block page_title %}Listado de Alumnos{% endblock %}
@@ -8,19 +9,19 @@
         <thead>
             <tr>
                 <th>Nombre</th>
-                <th>Carnet</th>
-                <th>Carrera</th>
+                <th>Email</th>
+                <th>Telefono</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            {% for alumno in object_list %}
+            {% for alumno in alumnos %}
             <tr>
-                <td>{{ alumno.nombre }}</td>
-                <td>{{ alumno.carnet }}</td>
-                <td>{{ alumno.carrera }}</td>
+                <td>{{ alumno.first_name }} {{ alumno.last_name }}</td>
+                <td>{{ alumno.email }}</td>
+                <td>{{ alumno.phone }}</td>
                 <td>
-                    <a href="{% url 'alumno:update' alumno.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'alumno:edit' alumno.pk %}" class="btn btn-sm btn-warning">Editar</a>
                     <a href="{% url 'alumno:delete' alumno.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
                 </td>
             </tr>
