@@ -2,12 +2,340 @@
 {% block title %}Notas{% endblock %}
 {% block page_title %}Formulario de Nota{% endblock %}
 {% block content %}
-<div class="container mt-3">
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Guardar</button>
-        <a href="{% url 'notas:list' %}" class="btn btn-secondary">Cancelar</a>
-    </form>
+
+<style>
+  .form-card {
+    background: #fff;
+    border: 1px solid #e8ecf0;
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    max-width: 660px;
+    margin: 0 auto;
+  }
+  .form-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .form-header-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: #f0fdf4;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .form-header-icon svg { width: 22px; height: 22px; stroke: #22c55e; }
+  .form-header h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 0.15rem;
+  }
+  .form-header p {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin: 0;
+  }
+  .section-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .field-wrap {
+    margin-bottom: 1.1rem;
+  }
+  .field-wrap label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.35rem;
+  }
+  .field-wrap input,
+  .field-wrap select,
+  .field-wrap textarea {
+    width: 100%;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.9rem;
+    color: #1e293b;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    outline: none;
+    appearance: none;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+  .field-wrap textarea {
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.6;
+  }
+  .field-wrap input:focus,
+  .field-wrap select:focus,
+  .field-wrap textarea:focus {
+    border-color: #22c55e;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+  }
+  .field-wrap .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 0.3rem 0 0;
+  }
+  .field-wrap .errorlist li {
+    font-size: 0.75rem;
+    color: #ef4444;
+  }
+  .field-hint {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    margin-top: 0.3rem;
+    display: block;
+  }
+  .field-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.1rem;
+  }
+  .field-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.1rem;
+  }
+  .field-grid-2 .field-wrap,
+  .field-grid-3 .field-wrap { margin-bottom: 0; }
+
+  .grade-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+  }
+  .grade-bar-track {
+    flex: 1;
+    height: 6px;
+    background: #f1f5f9;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .grade-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: #e2e8f0;
+    width: 0%;
+    transition: width 0.3s, background 0.3s;
+  }
+  .grade-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 20px;
+    text-align: right;
+  }
+
+  .char-counter {
+    float: right;
+    font-size: 0.7rem;
+    color: #cbd5e1;
+    margin-top: 0.3rem;
+  }
+  .char-counter.warn { color: #f59e0b; }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f1f5f9;
+    margin-top: 0.5rem;
+  }
+  .btn-cancel {
+    padding: 0.55rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .btn-cancel:hover { background: #e2e8f0; color: #475569; }
+  .btn-save {
+    padding: 0.55rem 1.4rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    background: #22c55e;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-save:hover { background: #16a34a; }
+  .btn-save:active { transform: scale(0.98); }
+
+  @media (max-width: 520px) {
+    .field-grid-2,
+    .field-grid-3 { grid-template-columns: 1fr; }
+    .form-card { padding: 1.25rem; }
+  }
+</style>
+
+<div class="form-card">
+
+  <div class="form-header">
+    <div class="form-header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+    </div>
+    <div>
+      <h2>Registrar calificación</h2>
+      <p>Asigna una nota a un alumno en un curso.</p>
+    </div>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <!-- Asignación -->
+    <p class="section-label">Asignación</p>
+
+    <div class="field-grid-2">
+      <div class="field-wrap">
+        <label for="{{ form.alumno.id_for_label }}">Alumno</label>
+        {{ form.alumno }}
+        {% if form.alumno.errors %}
+          <ul class="errorlist">{% for e in form.alumno.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+      <div class="field-wrap">
+        <label for="{{ form.curso.id_for_label }}">Curso</label>
+        {{ form.curso }}
+        {% if form.curso.errors %}
+          <ul class="errorlist">{% for e in form.curso.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Calificación y fecha -->
+    <p class="section-label" style="margin-top:1.25rem;">Calificación</p>
+
+    <div class="field-grid-3">
+      <div class="field-wrap" style="grid-column: span 1;">
+        <label for="{{ form.nota.id_for_label }}">
+          Nota <span style="font-weight:400; color:#94a3b8;">(0 – 100)</span>
+        </label>
+        {{ form.nota }}
+        <div class="grade-preview">
+          <div class="grade-bar-track">
+            <div class="grade-bar-fill" id="grade-bar"></div>
+          </div>
+          <span class="grade-label" id="grade-label" style="color:#94a3b8;">—</span>
+        </div>
+        {% if form.nota.errors %}
+          <ul class="errorlist">{% for e in form.nota.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+
+      <div class="field-wrap" style="grid-column: span 2;">
+        <label for="{{ form.fecha.id_for_label }}">Fecha de evaluación</label>
+        {{ form.fecha }}
+        <span class="field-hint">Día en que se realizó la evaluación.</span>
+        {% if form.fecha.errors %}
+          <ul class="errorlist">{% for e in form.fecha.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Comentario -->
+    <p class="section-label" style="margin-top:1.25rem;">Observaciones</p>
+
+    <div class="field-wrap">
+      <label for="{{ form.comentario.id_for_label }}">
+        Comentario <span style="font-weight:400; color:#94a3b8;">(opcional)</span>
+      </label>
+      {{ form.comentario }}
+      <div>
+        <span class="char-counter" id="char-counter">0 / 300</span>
+        <span class="field-hint" style="float:left;">Notas adicionales sobre el desempeño del alumno.</span>
+      </div>
+      {% if form.comentario.errors %}
+        <ul class="errorlist">{% for e in form.comentario.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'notas:list' %}" class="btn-cancel">Cancelar</a>
+      <button type="submit" class="btn-save">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21H5a2 2 0 0 0-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        Guardar
+      </button>
+    </div>
+
+  </form>
 </div>
+
+<script>
+  const noteInput   = document.getElementById('{{ form.nota.id_for_label }}');
+  const bar         = document.getElementById('grade-bar');
+  const lbl         = document.getElementById('grade-label');
+  const textarea    = document.getElementById('{{ form.comentario.id_for_label }}');
+  const counter     = document.getElementById('char-counter');
+  const MAX_CHARS   = 300;
+
+  function updateGrade(val) {
+    const n = parseFloat(val);
+    if (isNaN(n) || val === '') {
+      bar.style.width = '0%';
+      bar.style.background = '#e2e8f0';
+      lbl.textContent = '—';
+      lbl.style.color = '#94a3b8';
+      return;
+    }
+    const pct = Math.min(Math.max(n, 0), 100);
+    bar.style.width = pct + '%';
+    if (pct >= 90)      { bar.style.background = '#22c55e'; lbl.style.color = '#15803d'; lbl.textContent = 'A'; }
+    else if (pct >= 70) { bar.style.background = '#3b82f6'; lbl.style.color = '#1d4ed8'; lbl.textContent = 'B'; }
+    else if (pct >= 60) { bar.style.background = '#eab308'; lbl.style.color = '#a16207'; lbl.textContent = 'C'; }
+    else                { bar.style.background = '#ef4444'; lbl.style.color = '#b91c1c'; lbl.textContent = 'D'; }
+  }
+
+  function updateCounter() {
+    if (!textarea || !counter) return;
+    const len = textarea.value.length;
+    counter.textContent = len + ' / ' + MAX_CHARS;
+    counter.classList.toggle('warn', len > MAX_CHARS * 0.85);
+  }
+
+  if (noteInput) {
+    noteInput.addEventListener('input', () => updateGrade(noteInput.value));
+    updateGrade(noteInput.value);
+  }
+  if (textarea) {
+    textarea.addEventListener('input', updateCounter);
+    updateCounter();
+  }
+</script>
+
 {% endblock %}

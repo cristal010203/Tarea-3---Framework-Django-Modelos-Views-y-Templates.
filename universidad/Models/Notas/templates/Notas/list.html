@@ -2,32 +2,218 @@
 {% block title %}Notas{% endblock %}
 {% block page_title %}Listado de Calificaciones{% endblock %}
 {% block content %}
-<div class="container mt-3">
-    <a href="{% url 'notas:create' %}" class="btn btn-primary mb-3">Nueva Nota</a>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Alumno</th>
-                <th>Curso</th>
-                <th>Nota</th>
-                <th>Acciones</th>
-            </tr>
+
+<style>
+  .grade-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    padding: 0.25rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  .grade-a  { background: #dcfce7; color: #15803d; }
+  .grade-b  { background: #dbeafe; color: #1d4ed8; }
+  .grade-c  { background: #fef9c3; color: #a16207; }
+  .grade-d  { background: #fee2e2; color: #b91c1c; }
+
+  .alumno-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: #eff6ff;
+    color: #3b82f6;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .curso-pill {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
+  .tbl-header-cell {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    white-space: nowrap;
+  }
+  .tbl-header-cell:first-child { padding-left: 1.5rem; }
+  .tbl-header-cell:last-child  { padding-right: 1.5rem; text-align: right; }
+
+  .tbl-cell {
+    padding: 0.85rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f8fafc;
+    font-size: 0.88rem;
+    color: #1e293b;
+  }
+  .tbl-cell:first-child { padding-left: 1.5rem; }
+  .tbl-cell:last-child  { padding-right: 1.5rem; text-align: right; }
+
+  .tbl-row:hover { background: #f8fafc; }
+  .tbl-row:last-child .tbl-cell { border-bottom: none; }
+
+  .btn-edit {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.78rem; font-weight: 500;
+    color: #92400e;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 7px;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .btn-edit:hover { background: #fef3c7; color: #78350f; }
+
+  .btn-del {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.78rem; font-weight: 500;
+    color: #991b1b;
+    background: #fff5f5;
+    border: 1px solid #fecaca;
+    border-radius: 7px;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .btn-del:hover { background: #fee2e2; color: #7f1d1d; }
+
+  .empty-state {
+    text-align: center;
+    padding: 3.5rem 1rem;
+  }
+  .empty-icon {
+    width: 48px; height: 48px;
+    margin: 0 auto 0.75rem;
+    background: #f1f5f9;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .empty-icon svg { width: 22px; height: 22px; stroke: #94a3b8; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h5 class="mb-0 fw-semibold text-dark">Calificaciones</h5>
+    <small class="text-muted">Registro de notas por alumno y curso</small>
+  </div>
+  <a href="{% url 'notas:create' %}" class="btn btn-primary d-flex align-items-center gap-2">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    Nueva Nota
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table mb-0" style="width:100%; border-collapse:collapse;">
+        <thead style="background:#f8fafc;">
+          <tr>
+            <th class="tbl-header-cell">Alumno</th>
+            <th class="tbl-header-cell">Curso</th>
+            <th class="tbl-header-cell">Calificación</th>
+            <th class="tbl-header-cell">Acciones</th>
+          </tr>
         </thead>
         <tbody>
-            {% for nota in object_list %}
-            <tr>
-                <td>{{ nota.alumno }}</td>
-                <td>{{ nota.curso }}</td>
-                <td>{{ nota.nota }}</td>
-                <td>
-                    <a href="{% url 'notas:update' nota.pk %}" class="btn btn-sm btn-warning">Editar</a>
-                    <a href="{% url 'notas:delete' nota.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="4">No hay notas registradas.</td></tr>
-            {% endfor %}
+          {% for nota in object_list %}
+          <tr class="tbl-row">
+
+            <td class="tbl-cell">
+              <div class="d-flex align-items-center gap-2">
+                <div class="alumno-avatar">
+                  {{ nota.alumno.first_name|first|upper }}{{ nota.alumno.last_name|first|upper }}
+                </div>
+                <div>
+                  <div style="font-weight:600; font-size:0.88rem; color:#1e293b;">
+                    {{ nota.alumno.first_name }} {{ nota.alumno.last_name }}
+                  </div>
+                  <div style="font-size:0.75rem; color:#94a3b8;">{{ nota.alumno.email }}</div>
+                </div>
+              </div>
+            </td>
+
+            <td class="tbl-cell">
+              <span class="curso-pill">{{ nota.curso }}</span>
+            </td>
+
+            <td class="tbl-cell">
+              {% if nota.nota >= 90 %}
+                <span class="grade-badge grade-a">{{ nota.nota }}</span>
+              {% elif nota.nota >= 70 %}
+                <span class="grade-badge grade-b">{{ nota.nota }}</span>
+              {% elif nota.nota >= 60 %}
+                <span class="grade-badge grade-c">{{ nota.nota }}</span>
+              {% else %}
+                <span class="grade-badge grade-d">{{ nota.nota }}</span>
+              {% endif %}
+            </td>
+
+            <td class="tbl-cell">
+              <div class="d-flex justify-content-end gap-2">
+                <a href="{% url 'notas:update' nota.pk %}" class="btn-edit">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  Editar
+                </a>
+                <a href="{% url 'notas:delete' nota.pk %}" class="btn-del">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14H6L5 6"/>
+                    <path d="M9 6V4h6v2"/>
+                  </svg>
+                  Eliminar
+                </a>
+              </div>
+            </td>
+
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4">
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10 9 9 9 8 9"/>
+                  </svg>
+                </div>
+                <p class="mb-1 fw-semibold text-dark" style="font-size:0.9rem;">Sin calificaciones registradas</p>
+                <p class="text-muted mb-3" style="font-size:0.82rem;">Agrega la primera nota para comenzar.</p>
+                <a href="{% url 'notas:create' %}" class="btn btn-primary btn-sm">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  Nueva Nota
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
+  </div>
 </div>
+
 {% endblock %}
