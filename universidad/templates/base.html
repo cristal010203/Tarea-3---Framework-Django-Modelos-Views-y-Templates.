@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}JP University{% endblock %}</title>
 
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
@@ -21,7 +19,6 @@
             background: #f1f5f9;
         }
 
-        /* ══════════════ SIDEBAR ══════════════ */
         #sidebar {
             width: 240px;
             min-height: 100vh;
@@ -34,6 +31,14 @@
             left: 0;
             height: 100%;
             z-index: 100;
+            
+            transition: width 0.25s ease;
+            overflow: hidden;
+        }
+
+        
+        body.sidebar-collapsed #sidebar {
+            width: 64px;
         }
 
         #sidebar .sidebar-brand {
@@ -45,11 +50,20 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            
+            white-space: nowrap;
         }
 
         #sidebar .sidebar-brand i {
             color: #3b82f6;
             font-size: 1.4rem;
+           
+            flex-shrink: 0;
+        }
+
+        
+        body.sidebar-collapsed #sidebar .sidebar-brand .brand-text {
+            opacity: 0;
         }
 
         #sidebar .nav-section {
@@ -59,6 +73,14 @@
             letter-spacing: 0.08em;
             color: #64748b;
             font-weight: 600;
+            
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        
+        body.sidebar-collapsed #sidebar .nav-section {
+            opacity: 0;
         }
 
         #sidebar .nav-link {
@@ -72,12 +94,50 @@
             font-size: 0.9rem;
             transition: all 0.2s;
             text-decoration: none;
+          
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         #sidebar .nav-link i {
             font-size: 1.05rem;
             width: 20px;
             text-align: center;
+            
+            flex-shrink: 0;
+        }
+
+        
+        body.sidebar-collapsed #sidebar .nav-link .link-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        
+        body.sidebar-collapsed #sidebar .nav-link {
+            justify-content: center;
+            padding: 0.55rem;
+            margin: 2px 8px;
+            position: relative;
+        }
+
+        
+        body.sidebar-collapsed #sidebar .nav-link:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 54px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            white-space: nowrap;
+            z-index: 200;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         #sidebar .nav-link:hover {
@@ -90,6 +150,11 @@
             color: #fff;
         }
 
+        
+        body.sidebar-collapsed #sidebar .sidebar-footer {
+            opacity: 0;
+        }
+
         #sidebar .sidebar-footer {
             margin-top: auto;
             padding: 1rem;
@@ -97,18 +162,58 @@
             font-size: 0.78rem;
             color: #475569;
             text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
-        /* ══════════════ CONTENIDO PRINCIPAL ══════════════ */
+        
+        #sidebar-toggle {
+            position: absolute;
+            bottom: 60px;
+            right: 10px;
+            width: 28px;
+            height: 28px;
+            background: #334155;
+            border: none;
+            border-radius: 6px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        #sidebar-toggle:hover {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        
+        body.sidebar-collapsed #sidebar-toggle {
+            right: 50%;
+            transform: translateX(50%);
+        }
+
+       
+        body.sidebar-collapsed #sidebar-toggle i {
+            transform: rotate(180deg);
+        }
+
         #main-content {
             margin-left: 240px;
             flex: 1;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+           
+            transition: margin-left 0.25s ease;
         }
 
-        /* ══════════════ TOPBAR ══════════════ */
+        body.sidebar-collapsed #main-content {
+            margin-left: 64px;
+        }
+
         #topbar {
             background: #fff;
             padding: 0.8rem 1.8rem;
@@ -119,6 +224,31 @@
             position: sticky;
             top: 0;
             z-index: 99;
+        }
+
+    
+        #topbar .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        
+        #topbar-toggle {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 6px;
+            line-height: 1;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        #topbar-toggle:hover {
+            background: #f1f5f9;
+            color: #1e293b;
         }
 
         #topbar .page-heading {
@@ -145,13 +275,11 @@
             border-radius: 50%;
         }
 
-        /* ══════════════ CONTENIDO ══════════════ */
         .page-wrapper {
             padding: 1.8rem;
             flex: 1;
         }
 
-        /* ══════════════ ALERTS ══════════════ */
         .alerts-wrapper {
             padding: 0.8rem 1.8rem 0;
         }
@@ -161,76 +289,99 @@
 </head>
 <body>
 
-<!-- ══════════════════════ SIDEBAR ══════════════════════ -->
 <nav id="sidebar">
 
     <div class="sidebar-brand">
         <i class="bi bi-mortarboard-fill"></i>
-        JP University
+        
+        <span class="brand-text">JP University</span>
     </div>
 
     <div class="nav-section">Principal</div>
+
+
     <a href="{% url 'dashboard' %}"
-       class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-        <i class="bi bi-speedometer2"></i> Dashboard
+       class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+       data-tooltip="Dashboard">
+        <i class="bi bi-speedometer2"></i>
+        <span class="link-text">Dashboard</span>
     </a>
 
     <div class="nav-section">Académico</div>
 
     <a href="{% url 'alumno:list' %}"
-    class="nav-link {% if request.resolver_match.namespace == 'alumno' %}active{% endif %}">
-        <i class="bi bi-people-fill"></i> Alumnos
+       class="nav-link {% if request.resolver_match.namespace == 'alumno' %}active{% endif %}"
+       data-tooltip="Alumnos">
+        <i class="bi bi-people-fill"></i>
+        <span class="link-text">Alumnos</span>
     </a>
 
     <a href="{% url 'curso:list' %}"
-    class="nav-link {% if request.resolver_match.namespace == 'curso' %}active{% endif %}">
-        <i class="bi bi-journal-bookmark-fill"></i> Cursos
+       class="nav-link {% if request.resolver_match.namespace == 'curso' %}active{% endif %}"
+       data-tooltip="Cursos">
+        <i class="bi bi-journal-bookmark-fill"></i>
+        <span class="link-text">Cursos</span>
     </a>
 
     <a href="{% url 'notas:list' %}"
-    class="nav-link {% if request.resolver_match.namespace == 'notas' %}active{% endif %}">
-        <i class="bi bi-clipboard2-check-fill"></i> Calificaciones
+       class="nav-link {% if request.resolver_match.namespace == 'notas' %}active{% endif %}"
+       data-tooltip="Calificaciones">
+        <i class="bi bi-clipboard2-check-fill"></i>
+        <span class="link-text">Calificaciones</span>
     </a>
 
     <a href="{% url 'catedratico:list' %}"
-    class="nav-link {% if request.resolver_match.namespace == 'catedratico' %}active{% endif %}">
-        <i class="bi bi-person-badge-fill"></i> Catedráticos
+       class="nav-link {% if request.resolver_match.namespace == 'catedratico' %}active{% endif %}"
+       data-tooltip="Catedráticos">
+        <i class="bi bi-person-badge-fill"></i>
+        <span class="link-text">Catedráticos</span>
     </a>
 
     <a href="{% url 'asignacion_curso:list' %}"
-    class="nav-link {% if request.resolver_match.namespace == 'asignacion_curso' %}active{% endif %}">
-        <i class="bi bi-calendar-check-fill"></i> Asignación de Cursos
+       class="nav-link {% if request.resolver_match.namespace == 'asignacion_curso' %}active{% endif %}"
+       data-tooltip="Asignación de Cursos">
+        <i class="bi bi-calendar-check-fill"></i>
+        <span class="link-text">Asignación de Cursos</span>
     </a>
 
     <a href="{% url 'inscripcion_alumno:list' %}"
-    class="nav-link {% if request.resolver_match.namespace == 'inscripcion_alumno' %}active{% endif %}">
-        <i class="bi bi-person-lines-fill"></i> Inscripción de Alumnos
+       class="nav-link {% if request.resolver_match.namespace == 'inscripcion_alumno' %}active{% endif %}"
+       data-tooltip="Inscripción de Alumnos">
+        <i class="bi bi-person-lines-fill"></i>
+        <span class="link-text">Inscripción de Alumnos</span>
     </a>
-    
+
     <div class="nav-section">Sistema</div>
-    <a href="#" class="nav-link">
-        <i class="bi bi-gear-fill"></i> Configuración
+    <a href="#" class="nav-link" data-tooltip="Configuración">
+        <i class="bi bi-gear-fill"></i>
+        <span class="link-text">Configuración</span>
     </a>
 
     <div class="sidebar-footer">
         JP University &copy; {% now "Y" %}
     </div>
 
+    <button id="sidebar-toggle" title="Colapsar menú" onclick="toggleSidebar()">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+
 </nav>
 
-<!-- ══════════════════════ CONTENIDO PRINCIPAL ══════════════════════ -->
 <div id="main-content">
 
-    <!-- Topbar -->
     <div id="topbar">
-        <h6 class="page-heading">{% block page_title %}Panel{% endblock %}</h6>
+        <div class="topbar-left">
+            <button id="topbar-toggle" title="Colapsar menú" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+            <h6 class="page-heading">{% block page_title %}Panel{% endblock %}</h6>
+        </div>
         <div class="topbar-right">
             <span class="user-name">Administrador</span>
             <img src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff">
         </div>
     </div>
 
-    <!-- Mensajes Flash (success, error, etc.) -->
     {% if messages %}
     <div class="alerts-wrapper">
         {% for message in messages %}
@@ -243,15 +394,29 @@
     </div>
     {% endif %}
 
-    <!-- Contenido de cada página -->
     <div class="page-wrapper">
         {% block content %}{% endblock %}
     </div>
 
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Leer preferencia guardada al cargar la pagina
+    (function() {
+        if (localStorage.getItem('sidebar-collapsed') === 'true') {
+            document.body.classList.add('sidebar-collapsed');
+        }
+    })();
+
+    // Funcion que activa/desactiva el sidebar
+    function toggleSidebar() {
+        const collapsed = document.body.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('sidebar-collapsed', collapsed);
+    }
+</script>
+
 {% block extra_js %}{% endblock %}
 </body>
 </html>
