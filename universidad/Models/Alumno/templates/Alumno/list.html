@@ -1,128 +1,163 @@
-{% extends 'base.html' %}
+{% extends 'partials/list.html' %}
+
 {% block title %}Alumnos{% endblock %}
 {% block page_title %}Listado de Alumnos{% endblock %}
-{% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h5 class="mb-0 fw-semibold text-dark">Alumnos</h5>
-        <small class="text-muted">Gestión de alumnos registrados</small>
-    </div>
-    <a href="{% url 'alumno:create' %}" class="btn btn-primary d-flex align-items-center gap-2">
-        <i class="bi bi-person-plus-fill"></i> Nuevo Alumno
-    </a>
-</div>
+{% block list_title %}Alumnos{% endblock %}
+{% block list_subtitle %}Gestión de alumnos registrados{% endblock %}
+{% block create_url %}{% url 'alumno:create' %}{% endblock %}
+{% block create_label %}Nuevo Alumno{% endblock %}
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="ps-4 py-3 text-uppercase fw-semibold" style="font-size:0.75rem; color:#64748b; letter-spacing:0.05em;">Alumno</th>
-                        <th class="py-3 text-uppercase fw-semibold" style="font-size:0.75rem; color:#64748b; letter-spacing:0.05em;">Email</th>
-                        <th class="py-3 text-uppercase fw-semibold" style="font-size:0.75rem; color:#64748b; letter-spacing:0.05em;">Teléfono</th>
-                        <th class="py-3 text-uppercase fw-semibold" style="font-size:0.75rem; color:#64748b; letter-spacing:0.05em;">Género</th>
-                        <th class="py-3 text-uppercase fw-semibold" style="font-size:0.75rem; color:#64748b; letter-spacing:0.05em;">Nacimiento</th>
-                        <th class="py-3 text-uppercase fw-semibold" style="font-size:0.75rem; color:#64748b; letter-spacing:0.05em;">Inscrito</th>
-                        <th class="py-3 text-uppercase fw-semibold" style="font-size:0.75rem; color:#64748b; letter-spacing:0.05em;">Estado</th>
-                        <th class="py-3 text-uppercase fw-semibold text-end pe-4" style="font-size:0.75rem; color:#64748b; letter-spacing:0.05em;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for alumno in alumnos %}
-                    <tr>
-                        <td class="ps-4 py-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white"
-                                    style="width:38px; height:38px; background:#3b82f6; font-size:0.85rem; flex-shrink:0;">
-                                    {{ alumno.first_name|first|upper }}{{ alumno.last_name|first|upper }}
-                                </div>
-                                <div>
-                                    <div class="fw-semibold text-dark" style="font-size:0.9rem;">
-                                        {{ alumno.first_name }} {{ alumno.last_name }}
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
+{% block extra_styles %}
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: #3b82f6; color: #fff;
+    font-size: 0.78rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .gender-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 0.2rem 0.6rem; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 600;
+  }
+  .gender-m { background: #dbeafe; color: #1d4ed8; }
+  .gender-f { background: #fce7f3; color: #be185d; }
+  .gender-o { background: #f1f5f9; color: #64748b; }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 0.2rem 0.6rem; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 600;
+  }
+  .status-active   { background: #dcfce7; color: #15803d; }
+  .status-inactive { background: #fee2e2; color: #b91c1c; }
+{% endblock %}
 
-                        <td class="py-3">
-                            <span class="text-muted" style="font-size:0.88rem;">{{ alumno.email }}</span>
-                        </td>
+{% block table_headers %}
+  <th class="tbl-header-cell">Alumno</th>
+  <th class="tbl-header-cell">Email</th>
+  <th class="tbl-header-cell">Teléfono</th>
+  <th class="tbl-header-cell">Género</th>
+  <th class="tbl-header-cell">Nacimiento</th>
+  <th class="tbl-header-cell">Inscrito</th>
+  <th class="tbl-header-cell">Estado</th>
+  <th class="tbl-header-cell">Acciones</th>
+{% endblock %}
 
-                        <td class="py-3">
-                            <span class="text-muted" style="font-size:0.88rem;">
-                                {{ alumno.phone|default:"—" }}
-                            </span>
-                        </td>
+{% block table_rows %}
+  {% for alumno in alumnos %}
+  <tr class="tbl-row">
 
-                        <td class="py-3">
-                            {% if alumno.gender == 'M' %}
-                                <span class="badge rounded-pill" style="background:#dbeafe; color:#1d4ed8; font-size:0.78rem;">
-                                    <i class="bi bi-gender-male me-1"></i>Masculino
-                                </span>
-                            {% elif alumno.gender == 'F' %}
-                                <span class="badge rounded-pill" style="background:#fce7f3; color:#be185d; font-size:0.78rem;">
-                                    <i class="bi bi-gender-female me-1"></i>Femenino
-                                </span>
-                            {% else %}
-                                <span class="badge rounded-pill" style="background:#f1f5f9; color:#64748b; font-size:0.78rem;">
-                                    {{ alumno.gender }}
-                                </span>
-                            {% endif %}
-                        </td>
-
-                        <td class="py-3">
-                            <span class="text-muted" style="font-size:0.88rem;">
-                                {{ alumno.birth_date|date:"d/m/Y" }}
-                            </span>
-                        </td>
-
-                        <td class="py-3">
-                            <span class="text-muted" style="font-size:0.88rem;">
-                                {{ alumno.enrolled_at|date:"d/m/Y" }}
-                            </span>
-                        </td>
-
-                        <td class="py-3">
-                            {% if alumno.is_active %}
-                                <span class="badge rounded-pill" style="background:#dcfce7; color:#15803d; font-size:0.78rem;">
-                                    <i class="bi bi-check-circle-fill me-1"></i>Activo
-                                </span>
-                            {% else %}
-                                <span class="badge rounded-pill" style="background:#fee2e2; color:#b91c1c; font-size:0.78rem;">
-                                    <i class="bi bi-x-circle-fill me-1"></i>Inactivo
-                                </span>
-                            {% endif %}
-                        </td>
-
-                        <td class="py-3 pe-4 text-end">
-                            <a href="{% url 'alumno:edit' alumno.pk %}" class="btn btn-sm btn-light border me-1 d-inline-flex align-items-center gap-1">
-                                <i class="bi bi-pencil-fill" style="font-size:0.75rem; color:#f59e0b;"></i>
-                                <span style="font-size:0.82rem;">Editar</span>
-                            </a>
-                            <a href="{% url 'alumno:delete' alumno.pk %}" class="btn btn-sm btn-light border d-inline-flex align-items-center gap-1">
-                                <i class="bi bi-trash-fill" style="font-size:0.75rem; color:#ef4444;"></i>
-                                <span style="font-size:0.82rem;">Eliminar</span>
-                            </a>
-                        </td>
-                    </tr>
-
-                    {% empty %}
-                    <tr>
-                        <td colspan="8" class="text-center py-5">
-                            <i class="bi bi-people" style="font-size:2.5rem; color:#cbd5e1;"></i>
-                            <p class="mt-2 mb-0 text-muted">No hay alumnos registrados.</p>
-                            <a href="{% url 'alumno:create' %}" class="btn btn-primary btn-sm mt-3">
-                                <i class="bi bi-person-plus-fill me-1"></i> Agregar el primero
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <td class="tbl-cell">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar">
+          {{ alumno.first_name|first|upper }}{{ alumno.last_name|first|upper }}
         </div>
-    </div>
-</div>
+        <div style="font-weight:600; font-size:0.9rem; color:#1e293b;">
+          {{ alumno.first_name }} {{ alumno.last_name }}
+        </div>
+      </div>
+    </td>
 
+    <td class="tbl-cell">
+      <span style="color:#64748b;">{{ alumno.email }}</span>
+    </td>
+
+    <td class="tbl-cell">
+      <span style="color:#64748b;">{{ alumno.phone|default:"—" }}</span>
+    </td>
+
+    <td class="tbl-cell">
+      {% if alumno.gender == 'M' %}
+        <span class="gender-badge gender-m">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="10" cy="14" r="5"/><line x1="19" y1="5" x2="14.14" y2="9.86"/>
+            <polyline points="19 5 19 10 14 5 19 5"/>
+          </svg>
+          Masculino
+        </span>
+      {% elif alumno.gender == 'F' %}
+        <span class="gender-badge gender-f">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="9" r="5"/><line x1="12" y1="14" x2="12" y2="21"/>
+            <line x1="9" y1="18" x2="15" y2="18"/>
+          </svg>
+          Femenino
+        </span>
+      {% else %}
+        <span class="gender-badge gender-o">{{ alumno.gender }}</span>
+      {% endif %}
+    </td>
+
+    <td class="tbl-cell">
+      <span style="color:#64748b;">{{ alumno.birth_date|date:"d/m/Y" }}</span>
+    </td>
+
+    <td class="tbl-cell">
+      <span style="color:#64748b;">{{ alumno.enrolled_at|date:"d/m/Y" }}</span>
+    </td>
+
+    <td class="tbl-cell">
+      {% if alumno.is_active %}
+        <span class="status-badge status-active">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Activo
+        </span>
+      {% else %}
+        <span class="status-badge status-inactive">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          Inactivo
+        </span>
+      {% endif %}
+    </td>
+
+    <td class="tbl-cell">
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'alumno:edit' alumno.pk %}" class="btn-edit">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Editar
+        </a>
+        <a href="{% url 'alumno:delete' alumno.pk %}" class="btn-del">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/>
+            <path d="M9 6V4h6v2"/>
+          </svg>
+          Eliminar
+        </a>
+      </div>
+    </td>
+
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="8">
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <p class="mb-1 fw-semibold text-dark" style="font-size:0.9rem;">Sin alumnos registrados</p>
+        <p class="text-muted mb-3" style="font-size:0.82rem;">Agrega el primero para comenzar.</p>
+        <a href="{% url 'alumno:create' %}" class="btn btn-primary btn-sm">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Nuevo Alumno
+        </a>
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
 {% endblock %}

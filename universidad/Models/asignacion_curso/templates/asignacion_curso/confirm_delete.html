@@ -2,12 +2,277 @@
 {% block title %}Eliminar Asignación{% endblock %}
 {% block page_title %}Confirmar Eliminación{% endblock %}
 {% block content %}
-<div class="container mt-3">
-    <p>¿Estás seguro de que deseas eliminar la asignación del curso <strong>{{ object.curso }}</strong> con el catedrático <strong>{{ object.catedratico }}</strong>?</p>
+
+<style>
+  .delete-card {
+    max-width: 500px;
+    margin: 2rem auto;
+    background: #fff;
+    border: 1px solid #e8ecf0;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .delete-card-header {
+    background: #fff5f5;
+    border-bottom: 1px solid #fee2e2;
+    padding: 1.75rem 2rem 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .delete-icon-wrap {
+    width: 46px; height: 46px;
+    background: #fee2e2;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .delete-icon-wrap svg { width: 22px; height: 22px; stroke: #ef4444; }
+  .delete-card-header h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #991b1b;
+    margin: 0 0 0.2rem;
+  }
+  .delete-card-header p {
+    font-size: 0.82rem;
+    color: #b91c1c;
+    margin: 0;
+    opacity: 0.8;
+  }
+  .delete-card-body { padding: 1.5rem 2rem; }
+
+  .asignacion-preview {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1.25rem;
+  }
+  .preview-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .preview-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .preview-row:first-child { padding-top: 0; }
+
+  .preview-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .preview-icon svg { width: 14px; height: 14px; }
+  .icon-curso   { background: #f0fdf4; }
+  .icon-curso svg   { stroke: #22c55e; }
+  .icon-cat     { background: #fdf4ff; }
+  .icon-cat svg     { stroke: #9333ea; }
+  .icon-horario { background: #fff7ed; }
+  .icon-horario svg { stroke: #ea580c; }
+  .icon-aula    { background: #eff6ff; }
+  .icon-aula svg    { stroke: #3b82f6; }
+  .icon-cupo    { background: #f0fdf4; }
+  .icon-cupo svg    { stroke: #16a34a; }
+
+  .preview-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    min-width: 72px;
+  }
+  .preview-value {
+    font-size: 0.87rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+  .preview-value.muted {
+    font-weight: 400;
+    color: #64748b;
+  }
+
+  .cat-avatar-sm {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #fdf4ff;
+    color: #9333ea;
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-right: 5px;
+  }
+
+  .warning-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+  .warning-note svg { width: 15px; height: 15px; stroke: #d97706; flex-shrink: 0; margin-top: 1px; }
+  .warning-note span { font-size: 0.78rem; color: #92400e; line-height: 1.5; }
+
+  .delete-actions {
+    display: flex;
+    gap: 0.65rem;
+    justify-content: flex-end;
+  }
+  .btn-cancel {
+    padding: 0.55rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .btn-cancel:hover { background: #e2e8f0; color: #475569; }
+  .btn-delete {
+    padding: 0.55rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    background: #ef4444;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-delete:hover { background: #dc2626; }
+  .btn-delete:active { transform: scale(0.98); }
+</style>
+
+<div class="delete-card">
+
+  <div class="delete-card-header">
+    <div class="delete-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14H6L5 6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/>
+        <path d="M9 6V4h6v2"/>
+      </svg>
+    </div>
+    <div>
+      <h2>Eliminar asignación</h2>
+      <p>Esta acción no se puede deshacer.</p>
+    </div>
+  </div>
+
+  <div class="delete-card-body">
+
+    <div class="asignacion-preview">
+
+      <div class="preview-row">
+        <div class="preview-icon icon-curso">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+        </div>
+        <span class="preview-label">Curso</span>
+        <span class="preview-value">{{ object.curso.nombre }}</span>
+      </div>
+
+      <div class="preview-row">
+        <div class="preview-icon icon-cat">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+          </svg>
+        </div>
+        <span class="preview-label">Catedrático</span>
+        <span class="preview-value">
+          {% if object.catedratico %}
+            <span class="cat-avatar-sm">
+              {{ object.catedratico.first_name|first|upper }}{{ object.catedratico.last_name|first|upper }}
+            </span>
+            {{ object.catedratico.first_name }} {{ object.catedratico.last_name }}
+          {% else %}
+            <span class="muted">Sin asignar</span>
+          {% endif %}
+        </span>
+      </div>
+
+      <div class="preview-row">
+        <div class="preview-icon icon-horario">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <span class="preview-label">Horario</span>
+        <span class="preview-value muted">{{ object.horario }}</span>
+      </div>
+
+      <div class="preview-row">
+        <div class="preview-icon icon-aula">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <span class="preview-label">Aula</span>
+        <span class="preview-value muted">{{ object.aula }}</span>
+      </div>
+
+      <div class="preview-row">
+        <div class="preview-icon icon-cupo">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <span class="preview-label">Cupo</span>
+        <span class="preview-value muted">{{ object.cupo }} alumnos</span>
+      </div>
+
+    </div>
+
+    <div class="warning-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <span>
+        Se eliminará permanentemente la asignación del curso
+        <strong>{{ object.curso.nombre }}</strong> en el aula
+        <strong>{{ object.aula }}</strong>. Esta acción no afecta al curso ni al catedrático.
+      </span>
+    </div>
+
     <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-        <a href="{% url 'asignacion_curso:list' %}" class="btn btn-secondary">Cancelar</a>
+      {% csrf_token %}
+      <div class="delete-actions">
+        <a href="{% url 'asignacion_curso:list' %}" class="btn-cancel">Cancelar</a>
+        <button type="submit" class="btn-delete">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/>
+            <path d="M9 6V4h6v2"/>
+          </svg>
+          Sí, eliminar
+        </button>
+      </div>
     </form>
+
+  </div>
 </div>
+
 {% endblock %}

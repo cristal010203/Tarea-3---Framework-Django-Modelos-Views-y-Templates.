@@ -1,9 +1,14 @@
-{% extends 'base.html' %}
+{% extends 'partials/list.html' %}
+
 {% block title %}Cursos{% endblock %}
 {% block page_title %}Listado de Cursos{% endblock %}
-{% block content %}
 
-<style>
+{% block list_title %}Cursos{% endblock %}
+{% block list_subtitle %}Gestión de cursos disponibles{% endblock %}
+{% block create_url %}{% url 'curso:create' %}{% endblock %}
+{% block create_label %}Nuevo Curso{% endblock %}
+
+{% block extra_styles %}
   .curso-icon {
     width: 36px; height: 36px;
     border-radius: 9px;
@@ -13,223 +18,124 @@
   }
   .curso-icon svg { width: 17px; height: 17px; stroke: #22c55e; }
 
+  .desc-text {
+    font-size: 0.82rem; color: #94a3b8;
+    max-width: 280px; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+
   .creditos-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+    display: inline-flex; align-items: center; gap: 4px;
     padding: 0.22rem 0.65rem;
-    background: #eff6ff;
-    color: #1d4ed8;
-    border-radius: 999px;
-    font-size: 0.78rem;
-    font-weight: 600;
+    background: #eff6ff; color: #1d4ed8;
+    border-radius: 999px; font-size: 0.78rem; font-weight: 600;
   }
   .creditos-badge svg { width: 11px; height: 11px; stroke: #3b82f6; }
 
-  .docente-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    color: #475569;
-  }
   .docente-avatar {
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    background: #fdf4ff;
-    color: #9333ea;
-    font-size: 0.72rem;
-    font-weight: 700;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #fdf4ff; color: #9333ea;
+    font-size: 0.72rem; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
+{% endblock %}
 
-  .desc-text {
-    font-size: 0.82rem;
-    color: #94a3b8;
-    max-width: 320px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+{% block table_headers %}
+  <th class="tbl-header-cell">Curso</th>
+  <th class="tbl-header-cell">Docente</th>
+  <th class="tbl-header-cell">Créditos</th>
+  <th class="tbl-header-cell">Acciones</th>
+{% endblock %}
 
-  .tbl-header-cell {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: #94a3b8;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #f1f5f9;
-    white-space: nowrap;
-    background: #f8fafc;
-  }
-  .tbl-header-cell:first-child { padding-left: 1.5rem; }
-  .tbl-header-cell:last-child  { padding-right: 1.5rem; text-align: right; }
+{% block table_rows %}
+  {% for curso in object_list %}
+  <tr class="tbl-row">
 
-  .tbl-cell {
-    padding: 0.9rem 1rem;
-    vertical-align: middle;
-    border-bottom: 1px solid #f8fafc;
-    font-size: 0.88rem;
-    color: #1e293b;
-  }
-  .tbl-cell:first-child { padding-left: 1.5rem; }
-  .tbl-cell:last-child  { padding-right: 1.5rem; text-align: right; }
+    <td class="tbl-cell">
+      <div class="d-flex align-items-center gap-3">
+        <div class="curso-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-weight:600; font-size:0.9rem; color:#1e293b;">{{ curso.nombre }}</div>
+          <div class="desc-text">{{ curso.descripcion|default:"Sin descripción" }}</div>
+        </div>
+      </div>
+    </td>
 
-  .tbl-row:hover { background: #f8fafc; }
-  .tbl-row:last-child .tbl-cell { border-bottom: none; }
+    <td class="tbl-cell">
+      {% if curso.docente %}
+        <div class="d-flex align-items-center gap-2">
+          <div class="docente-avatar">
+            {{ curso.docente.first_name|first|upper }}{{ curso.docente.last_name|first|upper }}
+          </div>
+          <div>
+            <div style="font-size:0.85rem; font-weight:600; color:#1e293b;">
+              {{ curso.docente.first_name }} {{ curso.docente.last_name }}
+            </div>
+            <div style="font-size:0.72rem; color:#94a3b8;">{{ curso.docente.especialidad }}</div>
+          </div>
+        </div>
+      {% else %}
+        <span style="font-size:0.78rem; color:#cbd5e1;">Sin docente asignado</span>
+      {% endif %}
+    </td>
 
-  .btn-edit {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 0.3rem 0.7rem;
-    font-size: 0.78rem; font-weight: 500;
-    color: #92400e; background: #fffbeb;
-    border: 1px solid #fde68a; border-radius: 7px;
-    text-decoration: none; transition: background 0.15s;
-  }
-  .btn-edit:hover { background: #fef3c7; color: #78350f; }
+    <td class="tbl-cell">
+      <span class="creditos-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="6"/>
+          <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+        </svg>
+        {{ curso.creditos }} cr.
+      </span>
+    </td>
 
-  .btn-del {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 0.3rem 0.7rem;
-    font-size: 0.78rem; font-weight: 500;
-    color: #991b1b; background: #fff5f5;
-    border: 1px solid #fecaca; border-radius: 7px;
-    text-decoration: none; transition: background 0.15s;
-  }
-  .btn-del:hover { background: #fee2e2; color: #7f1d1d; }
+    <td class="tbl-cell">
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'curso:update' curso.pk %}" class="btn-edit">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Editar
+        </a>
+        <a href="{% url 'curso:delete' curso.pk %}" class="btn-del">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/>
+            <path d="M9 6V4h6v2"/>
+          </svg>
+          Eliminar
+        </a>
+      </div>
+    </td>
 
-  .empty-state { text-align: center; padding: 3.5rem 1rem; }
-  .empty-icon {
-    width: 48px; height: 48px;
-    margin: 0 auto 0.75rem;
-    background: #f1f5f9;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .empty-icon svg { width: 22px; height: 22px; stroke: #94a3b8; }
-</style>
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <div>
-    <h5 class="mb-0 fw-semibold text-dark">Cursos</h5>
-    <small class="text-muted">Gestión de cursos disponibles</small>
-  </div>
-  <a href="{% url 'curso:create' %}" class="btn btn-primary d-flex align-items-center gap-2">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
-    Nuevo Curso
-  </a>
-</div>
-
-<div class="card border-0 shadow-sm">
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table mb-0" style="width:100%; border-collapse:collapse;">
-        <thead>
-          <tr>
-            <th class="tbl-header-cell">Curso</th>
-            <th class="tbl-header-cell">Docente</th>
-            <th class="tbl-header-cell">Créditos</th>
-            <th class="tbl-header-cell">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for curso in object_list %}
-          <tr class="tbl-row">
-
-            <td class="tbl-cell">
-              <div class="d-flex align-items-center gap-3">
-                <div class="curso-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                  </svg>
-                </div>
-                <div>
-                  <div style="font-weight:600; font-size:0.9rem; color:#1e293b;">{{ curso.nombre }}</div>
-                  <div class="desc-text">{{ curso.descripcion|default:"Sin descripción" }}</div>
-                </div>
-              </div>
-            </td>
-
-            <td class="tbl-cell">
-              {% if curso.docente %}
-                <div class="docente-chip">
-                  <div class="docente-avatar">
-                    {{ curso.docente.first_name|first|upper }}{{ curso.docente.last_name|first|upper }}
-                  </div>
-                  <div>
-                    <div style="font-size:0.85rem; font-weight:600; color:#1e293b;">
-                      {{ curso.docente.first_name }} {{ curso.docente.last_name }}
-                    </div>
-                    <div style="font-size:0.72rem; color:#94a3b8;">{{ curso.docente.especialidad }}</div>
-                  </div>
-                </div>
-              {% else %}
-                <span style="font-size:0.78rem; color:#cbd5e1;">Sin docente asignado</span>
-              {% endif %}
-            </td>
-
-            <td class="tbl-cell">
-              <span class="creditos-badge">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="8" r="6"/>
-                  <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
-                </svg>
-                {{ curso.creditos }} cr.
-              </span>
-            </td>
-
-            <td class="tbl-cell">
-              <div class="d-flex justify-content-end gap-2">
-                <a href="{% url 'curso:update' curso.pk %}" class="btn-edit">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                  </svg>
-                  Editar
-                </a>
-                <a href="{% url 'curso:delete' curso.pk %}" class="btn-del">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6l-1 14H6L5 6"/>
-                    <path d="M9 6V4h6v2"/>
-                  </svg>
-                  Eliminar
-                </a>
-              </div>
-            </td>
-
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="4">
-              <div class="empty-state">
-                <div class="empty-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                  </svg>
-                </div>
-                <p class="mb-1 fw-semibold text-dark" style="font-size:0.9rem;">Sin cursos registrados</p>
-                <p class="text-muted mb-3" style="font-size:0.82rem;">Agrega el primer curso para comenzar.</p>
-                <a href="{% url 'curso:create' %}" class="btn btn-primary btn-sm">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
-                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                  </svg>
-                  Nuevo Curso
-                </a>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="4">
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+        </div>
+        <p class="mb-1 fw-semibold text-dark" style="font-size:0.9rem;">Sin cursos registrados</p>
+        <p class="text-muted mb-3" style="font-size:0.82rem;">Agrega el primer curso para comenzar.</p>
+        <a href="{% url 'curso:create' %}" class="btn btn-primary btn-sm">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Nuevo Curso
+        </a>
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
 {% endblock %}

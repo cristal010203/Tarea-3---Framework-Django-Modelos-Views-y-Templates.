@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .form-card {
+    background: #fff;
+    border: 1px solid #e8ecf0;
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .form-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .form-header-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    background: {% block icon_bg %}#f0fdf4{% endblock %};
+  }
+  .form-header-icon svg {
+    width: 22px; height: 22px;
+    stroke: {% block icon_color %}#22c55e{% endblock %};
+  }
+  .form-header h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 0.15rem;
+  }
+  .form-header p {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin: 0;
+  }
+  .section-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .field-wrap { margin-bottom: 1.1rem; }
+  .field-wrap label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.35rem;
+  }
+  .field-wrap input,
+  .field-wrap select,
+  .field-wrap textarea {
+    width: 100%;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.9rem;
+    color: #1e293b;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    outline: none;
+    appearance: none;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+  .field-wrap textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+  .field-wrap input:focus,
+  .field-wrap select:focus,
+  .field-wrap textarea:focus {
+    border-color: {% block focus_color %}#22c55e{% endblock %};
+    background: #fff;
+    box-shadow: 0 0 0 3px {% block focus_shadow %}rgba(34,197,94,0.12){% endblock %};
+  }
+  .field-wrap .errorlist { list-style: none; padding: 0; margin: 0.3rem 0 0; }
+  .field-wrap .errorlist li { font-size: 0.75rem; color: #ef4444; }
+  .field-hint { font-size: 0.72rem; color: #94a3b8; margin-top: 0.3rem; display: block; }
+  .field-optional { font-weight: 400; color: #94a3b8; font-size: 0.75rem; }
+  .field-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.1rem;
+  }
+  .field-grid-2 .field-wrap { margin-bottom: 0; }
+  .field-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.1rem;
+  }
+  .field-grid-3 .field-wrap { margin-bottom: 0; }
+  .input-icon-wrap { position: relative; }
+  .input-icon-wrap svg {
+    position: absolute; left: 0.75rem; top: 50%;
+    transform: translateY(-50%);
+    width: 15px; height: 15px;
+    stroke: #cbd5e1; pointer-events: none;
+  }
+  .input-icon-wrap input,
+  .input-icon-wrap select { padding-left: 2.2rem; }
+  .toggle-wrap { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0; }
+  .toggle-wrap input[type="checkbox"] {
+    width: 2.2rem; height: 1.2rem;
+    appearance: none; background: #e2e8f0;
+    border-radius: 999px; cursor: pointer;
+    position: relative; transition: background 0.2s;
+    flex-shrink: 0; border: none; padding: 0;
+  }
+  .toggle-wrap input[type="checkbox"]::after {
+    content: ''; position: absolute;
+    top: 3px; left: 3px;
+    width: 0.9rem; height: 0.9rem;
+    background: #fff; border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle-wrap input[type="checkbox"]:checked { background: #22c55e; }
+  .toggle-wrap input[type="checkbox"]:checked::after { transform: translateX(1rem); }
+  .toggle-label { font-size: 0.88rem; color: #475569; font-weight: 500; }
+  .form-actions {
+    display: flex; justify-content: flex-end; gap: 0.65rem;
+    padding-top: 1.5rem; border-top: 1px solid #f1f5f9; margin-top: 0.5rem;
+  }
+  .btn-cancel {
+    padding: 0.55rem 1.2rem; font-size: 0.85rem; font-weight: 500;
+    color: #64748b; background: #f1f5f9; border: 1px solid #e2e8f0;
+    border-radius: 8px; text-decoration: none; transition: background 0.15s;
+  }
+  .btn-cancel:hover { background: #e2e8f0; color: #475569; }
+  .btn-save {
+    padding: 0.55rem 1.4rem; font-size: 0.85rem; font-weight: 600;
+    color: #fff; border: none; border-radius: 8px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    transition: background 0.15s, transform 0.1s;
+    background: {% block btn_color %}#22c55e{% endblock %};
+  }
+  .btn-save:hover { background: {% block btn_hover %}#16a34a{% endblock %}; }
+  .btn-save:active { transform: scale(0.98); }
+  @media (max-width: 520px) {
+    .field-grid-2, .field-grid-3 { grid-template-columns: 1fr; }
+    .form-card { padding: 1.25rem; }
+  }
+</style>
+
+<div class="form-card">
+  <div class="form-header">
+    <div class="form-header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        {% block header_icon %}{% endblock %}
+      </svg>
+    </div>
+    <div>
+      <h2>{% block form_title %}Formulario{% endblock %}</h2>
+      <p>{% block form_subtitle %}Completa los campos requeridos.{% endblock %}</p>
+    </div>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% block form_fields %}{% endblock %}
+    <div class="form-actions">
+      <a href="{% block cancel_url %}{% endblock %}" class="btn-cancel">Cancelar</a>
+      <button type="submit" class="btn-save">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21H5a2 2 0 0 0-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        Guardar
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

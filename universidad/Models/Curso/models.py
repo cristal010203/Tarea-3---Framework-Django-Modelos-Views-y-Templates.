@@ -1,10 +1,16 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 from universidad.Models.catedratico.models import Catedratico
 
 class Curso(models.Model):
     nombre      = models.CharField(max_length=100, verbose_name="Nombre")
     descripcion = models.TextField(blank=True, verbose_name="Descripción")
-    creditos    = models.PositiveIntegerField(default=0, verbose_name="Créditos")
+    creditos    = models.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        default=0.0,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        verbose_name="Créditos")
     docente     = models.ForeignKey(
         Catedratico,
         on_delete=models.SET_NULL,
