@@ -29,16 +29,16 @@
   .docente-chip {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     font-size: 0.85rem;
     color: #475569;
   }
   .docente-avatar {
-    width: 26px; height: 26px;
+    width: 34px; height: 34px;
     border-radius: 50%;
-    background: #f1f5f9;
-    color: #64748b;
-    font-size: 0.65rem;
+    background: #fdf4ff;
+    color: #9333ea;
+    font-size: 0.72rem;
     font-weight: 700;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
@@ -156,12 +156,21 @@
             </td>
 
             <td class="tbl-cell">
-              <div class="docente-chip">
-                <div class="docente-avatar">
-                  {{ curso.docente|first|upper }}
+              {% if curso.docente %}
+                <div class="docente-chip">
+                  <div class="docente-avatar">
+                    {{ curso.docente.first_name|first|upper }}{{ curso.docente.last_name|first|upper }}
+                  </div>
+                  <div>
+                    <div style="font-size:0.85rem; font-weight:600; color:#1e293b;">
+                      {{ curso.docente.first_name }} {{ curso.docente.last_name }}
+                    </div>
+                    <div style="font-size:0.72rem; color:#94a3b8;">{{ curso.docente.especialidad }}</div>
+                  </div>
                 </div>
-                {{ curso.docente }}
-              </div>
+              {% else %}
+                <span style="font-size:0.78rem; color:#cbd5e1;">Sin docente asignado</span>
+              {% endif %}
             </td>
 
             <td class="tbl-cell">

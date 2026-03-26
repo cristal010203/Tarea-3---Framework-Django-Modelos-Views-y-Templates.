@@ -1,3 +1,4 @@
+
 from django.shortcuts import render
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -23,3 +24,4 @@ class CursoDeleteView(DeleteView):
     model = Curso
     template_name = 'curso/confirm_delete.html'
     success_url = reverse_lazy('curso:list')
+

@@ -2,32 +2,280 @@
 {% block title %}Asignación de Cursos{% endblock %}
 {% block page_title %}Listado de Asignaciones de Cursos{% endblock %}
 {% block content %}
-<div class="container mt-3">
-    <a href="{% url 'asignacion_curso:create' %}" class="btn btn-primary mb-3">Nueva Asignación</a>
-    <table class="table table-striped">
+
+<style>
+  .curso-icon {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: #f0fdf4;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .curso-icon svg { width: 16px; height: 16px; stroke: #22c55e; }
+
+  .cat-avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #fdf4ff;
+    color: #9333ea;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .horario-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.22rem 0.65rem;
+    background: #fff7ed;
+    color: #c2410c;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .horario-badge svg { width: 11px; height: 11px; stroke: #ea580c; }
+
+  .aula-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.22rem 0.65rem;
+    background: #f0fdf4;
+    color: #15803d;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .aula-badge svg { width: 11px; height: 11px; stroke: #16a34a; }
+
+  .cupo-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cupo-bar-track {
+    width: 64px;
+    height: 5px;
+    background: #f1f5f9;
+    border-radius: 999px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .cupo-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: #3b82f6;
+  }
+  .cupo-label {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .tbl-header-cell {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    white-space: nowrap;
+    background: #f8fafc;
+  }
+  .tbl-header-cell:first-child { padding-left: 1.5rem; }
+  .tbl-header-cell:last-child  { padding-right: 1.5rem; text-align: right; }
+
+  .tbl-cell {
+    padding: 0.9rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f8fafc;
+    font-size: 0.88rem;
+    color: #1e293b;
+  }
+  .tbl-cell:first-child { padding-left: 1.5rem; }
+  .tbl-cell:last-child  { padding-right: 1.5rem; text-align: right; }
+
+  .tbl-row:hover { background: #f8fafc; }
+  .tbl-row:last-child .tbl-cell { border-bottom: none; }
+
+  .btn-edit {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.78rem; font-weight: 500;
+    color: #92400e; background: #fffbeb;
+    border: 1px solid #fde68a; border-radius: 7px;
+    text-decoration: none; transition: background 0.15s;
+  }
+  .btn-edit:hover { background: #fef3c7; color: #78350f; }
+
+  .btn-del {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.78rem; font-weight: 500;
+    color: #991b1b; background: #fff5f5;
+    border: 1px solid #fecaca; border-radius: 7px;
+    text-decoration: none; transition: background 0.15s;
+  }
+  .btn-del:hover { background: #fee2e2; color: #7f1d1d; }
+
+  .empty-state { text-align: center; padding: 3.5rem 1rem; }
+  .empty-icon {
+    width: 48px; height: 48px;
+    margin: 0 auto 0.75rem;
+    background: #f1f5f9;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .empty-icon svg { width: 22px; height: 22px; stroke: #94a3b8; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h5 class="mb-0 fw-semibold text-dark">Asignación de Cursos</h5>
+    <small class="text-muted">Gestión de asignaciones de cursos y catedráticos</small>
+  </div>
+  <a href="{% url 'asignacion_curso:create' %}" class="btn btn-primary d-flex align-items-center gap-2">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    Nueva Asignación
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table mb-0" style="width:100%; border-collapse:collapse;">
         <thead>
-            <tr>
-                <th>Curso</th>
-                <th>Catedrático</th>
-                <th>Horario</th>
-                <th>Acciones</th>
-            </tr>
+          <tr>
+            <th class="tbl-header-cell">Curso</th>
+            <th class="tbl-header-cell">Catedrático</th>
+            <th class="tbl-header-cell">Horario</th>
+            <th class="tbl-header-cell">Aula</th>
+            <th class="tbl-header-cell">Cupo</th>
+            <th class="tbl-header-cell">Acciones</th>
+          </tr>
         </thead>
         <tbody>
-            {% for asignacion in object_list %}
-            <tr>
-                <td>{{ asignacion.curso }}</td>
-                <td>{{ asignacion.catedratico }}</td>
-                <td>{{ asignacion.horario }}</td>
-                <td>
-                    <a href="{% url 'asignacion_curso:update' asignacion.pk %}" class="btn btn-sm btn-warning">Editar</a>
-                    <a href="{% url 'asignacion_curso:delete' asignacion.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="4">No hay asignaciones registradas.</td></tr>
-            {% endfor %}
+          {% for asignacion in object_list %}
+          <tr class="tbl-row">
+
+            <td class="tbl-cell">
+              <div class="d-flex align-items-center gap-2">
+                <div class="curso-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                  </svg>
+                </div>
+                <span style="font-weight:600; font-size:0.88rem; color:#1e293b;">
+                  {{ asignacion.curso.nombre }}
+                </span>
+              </div>
+            </td>
+
+            <td class="tbl-cell">
+              {% if asignacion.catedratico %}
+                <div class="d-flex align-items-center gap-2">
+                  <div class="cat-avatar">
+                    {{ asignacion.catedratico.first_name|first|upper }}{{ asignacion.catedratico.last_name|first|upper }}
+                  </div>
+                  <div>
+                    <div style="font-size:0.85rem; font-weight:600; color:#1e293b;">
+                      {{ asignacion.catedratico.first_name }} {{ asignacion.catedratico.last_name }}
+                    </div>
+                    <div style="font-size:0.72rem; color:#94a3b8;">
+                      {{ asignacion.catedratico.especialidad }}
+                    </div>
+                  </div>
+                </div>
+              {% else %}
+                <span style="font-size:0.78rem; color:#cbd5e1;">Sin asignar</span>
+              {% endif %}
+            </td>
+
+            <td class="tbl-cell">
+              <span class="horario-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                {{ asignacion.horario }}
+              </span>
+            </td>
+
+            <td class="tbl-cell">
+              <span class="aula-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                {{ asignacion.aula }}
+              </span>
+            </td>
+
+            <td class="tbl-cell">
+              <div class="cupo-bar-wrap">
+                <div class="cupo-bar-track">
+                  <div class="cupo-bar-fill" style="width:100%;"></div>
+                </div>
+                <span class="cupo-label">{{ asignacion.cupo }} alumnos</span>
+              </div>
+            </td>
+
+            <td class="tbl-cell">
+              <div class="d-flex justify-content-end gap-2">
+                <a href="{% url 'asignacion_curso:update' asignacion.pk %}" class="btn-edit">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  Editar
+                </a>
+                <a href="{% url 'asignacion_curso:delete' asignacion.pk %}" class="btn-del">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14H6L5 6"/>
+                    <path d="M9 6V4h6v2"/>
+                  </svg>
+                  Eliminar
+                </a>
+              </div>
+            </td>
+
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </div>
+                <p class="mb-1 fw-semibold text-dark" style="font-size:0.9rem;">Sin asignaciones registradas</p>
+                <p class="text-muted mb-3" style="font-size:0.82rem;">Asigna un catedrático a un curso para comenzar.</p>
+                <a href="{% url 'asignacion_curso:create' %}" class="btn btn-primary btn-sm">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  Nueva Asignación
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
+  </div>
 </div>
+
 {% endblock %}

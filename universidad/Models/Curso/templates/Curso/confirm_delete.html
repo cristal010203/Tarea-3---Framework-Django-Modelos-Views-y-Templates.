@@ -2,12 +2,263 @@
 {% block title %}Eliminar Curso{% endblock %}
 {% block page_title %}Confirmar Eliminación{% endblock %}
 {% block content %}
-<div class="container mt-3">
-    <p>¿Estás seguro de que deseas eliminar el curso <strong>{{ object }}</strong>?</p>
+
+<style>
+  .delete-card {
+    max-width: 480px;
+    margin: 2rem auto;
+    background: #fff;
+    border: 1px solid #e8ecf0;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .delete-card-header {
+    background: #fff5f5;
+    border-bottom: 1px solid #fee2e2;
+    padding: 1.75rem 2rem 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .delete-icon-wrap {
+    width: 46px; height: 46px;
+    background: #fee2e2;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .delete-icon-wrap svg { width: 22px; height: 22px; stroke: #ef4444; }
+  .delete-card-header h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #991b1b;
+    margin: 0 0 0.2rem;
+  }
+  .delete-card-header p {
+    font-size: 0.82rem;
+    color: #b91c1c;
+    margin: 0;
+    opacity: 0.8;
+  }
+  .delete-card-body { padding: 1.5rem 2rem; }
+
+  .curso-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .curso-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: #f0fdf4;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .curso-icon svg { width: 19px; height: 19px; stroke: #22c55e; }
+  .curso-name {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+  .curso-desc {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 280px;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem 1.25rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .detail-item label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin-bottom: 0.2rem;
+  }
+  .detail-item span {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #1e293b;
+  }
+  .creditos-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.18rem 0.6rem;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .docente-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .docente-avatar-sm {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #fdf4ff;
+    color: #9333ea;
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .warning-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+  .warning-note svg { width: 15px; height: 15px; stroke: #d97706; flex-shrink: 0; margin-top: 1px; }
+  .warning-note span { font-size: 0.78rem; color: #92400e; line-height: 1.5; }
+
+  .delete-actions {
+    display: flex;
+    gap: 0.65rem;
+    justify-content: flex-end;
+  }
+  .btn-cancel {
+    padding: 0.55rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .btn-cancel:hover { background: #e2e8f0; color: #475569; }
+  .btn-delete {
+    padding: 0.55rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    background: #ef4444;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-delete:hover { background: #dc2626; }
+  .btn-delete:active { transform: scale(0.98); }
+</style>
+
+<div class="delete-card">
+
+  <div class="delete-card-header">
+    <div class="delete-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14H6L5 6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/>
+        <path d="M9 6V4h6v2"/>
+      </svg>
+    </div>
+    <div>
+      <h2>Eliminar curso</h2>
+      <p>Esta acción no se puede deshacer.</p>
+    </div>
+  </div>
+
+  <div class="delete-card-body">
+
+    <div class="curso-preview">
+      <div class="curso-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+      </div>
+      <div style="min-width:0;">
+        <p class="curso-name">{{ object.nombre }}</p>
+        <p class="curso-desc">{{ object.descripcion|default:"Sin descripción" }}</p>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-item">
+        <label>Créditos</label>
+        <span>
+          <span class="creditos-badge">{{ object.creditos }} cr.</span>
+        </span>
+      </div>
+      <div class="detail-item">
+        <label>Docente</label>
+        <span>
+          {% if object.docente %}
+            <div class="docente-chip">
+              <div class="docente-avatar-sm">
+                {{ object.docente.first_name|first|upper }}{{ object.docente.last_name|first|upper }}
+              </div>
+              {{ object.docente.first_name }} {{ object.docente.last_name }}
+            </div>
+          {% else %}
+            <span style="color:#cbd5e1; font-weight:400;">Sin asignar</span>
+          {% endif %}
+        </span>
+      </div>
+    </div>
+
+    <div class="warning-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <span>
+        Se eliminará permanentemente el curso <strong>{{ object.nombre }}</strong>
+        y todos los registros de notas asociados a él.
+      </span>
+    </div>
+
     <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-        <a href="{% url 'curso:list' %}" class="btn btn-secondary">Cancelar</a>
+      {% csrf_token %}
+      <div class="delete-actions">
+        <a href="{% url 'curso:list' %}" class="btn-cancel">Cancelar</a>
+        <button type="submit" class="btn-delete">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/>
+            <path d="M9 6V4h6v2"/>
+          </svg>
+          Sí, eliminar
+        </button>
+      </div>
     </form>
+
+  </div>
 </div>
+
 {% endblock %}
