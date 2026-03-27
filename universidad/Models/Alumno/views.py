@@ -6,21 +6,20 @@ from .forms import AlumnoForm
 
 
 def alumno_list(request):
-    query   = request.GET.get('q', '').strip()
-    alumnos = Alumno.objects.all()
+    query      = request.GET.get('q', '').strip()
+    object_list = Alumno.objects.all()
 
     if query:
-        alumnos = alumnos.filter(
+        object_list = object_list.filter(
             Q(first_name__icontains=query) |
             Q(last_name__icontains=query)  |
             Q(email__icontains=query)
         )
 
     return render(request, 'alumno/list.html', {
-        'alumnos': alumnos,
-        'query':   query,
+        'object_list': object_list,
+        'query':       query,
     })
-
 
 def alumno_detail(request, pk):
     alumno = get_object_or_404(Alumno, pk=pk)

@@ -42,10 +42,11 @@
   <th class="tbl-header-cell">Inscrito</th>
   <th class="tbl-header-cell">Estado</th>
   <th class="tbl-header-cell">Acciones</th>
+
 {% endblock %}
 
 {% block table_rows %}
-  {% for alumno in alumnos %}
+  {% for alumno in object_list %}
   <tr class="tbl-row">
 
     <td class="tbl-cell">

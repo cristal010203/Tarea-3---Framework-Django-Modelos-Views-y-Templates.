@@ -1,13 +1,58 @@
-{% extends 'base.html' %}
+{% extends 'partials/form.html' %}
+
 {% block title %}Inscripción{% endblock %}
-{% block page_title %}Formulario de Inscripción de Alumno{% endblock %}
-{% block content %}
-<div class="container mt-3">
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Guardar</button>
-        <a href="{% url 'inscripcion_alumno:list' %}" class="btn btn-secondary">Cancelar</a>
-    </form>
-</div>
+{% block page_title %}Formulario de Inscripción{% endblock %}
+
+{% block icon_bg %}#eff6ff{% endblock %}
+{% block icon_color %}#3b82f6{% endblock %}
+{% block focus_color %}#3b82f6{% endblock %}
+{% block focus_shadow %}rgba(59,130,246,0.12){% endblock %}
+{% block btn_color %}#3b82f6{% endblock %}
+{% block btn_hover %}#2563eb{% endblock %}
+
+{% block header_icon %}
+  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+  <circle cx="9" cy="7" r="4"/>
+  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+{% endblock %}
+
+{% block form_title %}Inscripción de Alumno{% endblock %}
+{% block form_subtitle %}Asigna un alumno a una asignación de curso disponible.{% endblock %}
+{% block cancel_url %}{% url 'inscripcion_alumno:list' %}{% endblock %}
+
+{% block form_fields %}
+
+  <p class="section-label">Datos de inscripción</p>
+
+  <div class="field-wrap">
+    <label for="{{ form.alumno.id_for_label }}">Alumno</label>
+    <div class="input-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      {{ form.alumno }}
+    </div>
+    <span class="field-hint">Solo se muestran alumnos activos.</span>
+    {% if form.alumno.errors %}
+      <ul class="errorlist">{% for e in form.alumno.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    {% endif %}
+  </div>
+
+  <div class="field-wrap">
+    <label for="{{ form.asignacion_curso.id_for_label }}">Asignación de curso</label>
+    <div class="input-icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
+      {{ form.asignacion_curso }}
+    </div>
+    <span class="field-hint">Selecciona el curso, aula y horario al que se inscribirá el alumno.</span>
+    {% if form.asignacion_curso.errors %}
+      <ul class="errorlist">{% for e in form.asignacion_curso.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    {% endif %}
+  </div>
+
 {% endblock %}

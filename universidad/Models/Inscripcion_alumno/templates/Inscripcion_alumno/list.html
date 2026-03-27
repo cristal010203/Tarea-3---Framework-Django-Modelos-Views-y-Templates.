@@ -1,31 +1,143 @@
-{% extends 'base.html' %}
+{% extends 'partials/list.html' %}
+
 {% block title %}Inscripciones{% endblock %}
-{% block page_title %}Listado de Inscripciones de Alumnos{% endblock %}
-{% block content %}
-<div class="container mt-3">
-    <a href="{% url 'inscripcion_alumno:create' %}" class="btn btn-primary mb-3">Nueva Inscripción</a>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Alumno</th>
-                <th>Curso Asignado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for inscripcion in object_list %}
-            <tr>
-                <td>{{ inscripcion.alumno }}</td>
-                <td>{{ inscripcion.asignacion_curso }}</td>
-                <td>
-                    <a href="{% url 'inscripcion_alumno:update' inscripcion.pk %}" class="btn btn-sm btn-warning">Editar</a>
-                    <a href="{% url 'inscripcion_alumno:delete' inscripcion.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="3">No hay inscripciones registradas.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+{% block page_title %}Listado de Inscripciones{% endblock %}
+
+{% block list_title %}Inscripciones{% endblock %}
+{% block list_subtitle %}Gestión de inscripciones de alumnos a cursos{% endblock %}
+{% block create_url %}{% url 'inscripcion_alumno:create' %}{% endblock %}
+{% block create_label %}Nueva Inscripción{% endblock %}
+
+{% block extra_styles %}
+.alumno-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #eff6ff; color: #3b82f6;
+  font-size: 0.75rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.carnet-badge {
+  display: inline-flex; align-items: center;
+  padding: 0.15rem 0.55rem;
+  background: #f1f5f9; color: #475569;
+  border-radius: 6px; font-size: 0.7rem;
+  font-weight: 600; font-family: monospace;
+  letter-spacing: 0.05em;
+}
+.fecha-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 0.2rem 0.6rem;
+  background: #f0fdf4; color: #15803d;
+  border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+}
+.fecha-badge svg { width: 11px; height: 11px; stroke: #16a34a; }
+.curso-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 0.18rem 0.55rem;
+  background: #fff7ed; color: #c2410c;
+  border-radius: 6px; font-size: 0.75rem; font-weight: 500;
+  margin: 2px;
+}
+.curso-pill svg { width: 10px; height: 10px; stroke: #ea580c; }
+.cursos-wrap { display: flex; flex-wrap: wrap; gap: 2px; }
+{% endblock %}
+
+{% block table_headers %}
+  <th class="tbl-header-cell">Alumno</th>
+  <th class="tbl-header-cell">Fecha inscripción</th>
+  <th class="tbl-header-cell">Cursos asignados</th>
+  <th class="tbl-header-cell">Acciones</th>
+{% endblock %}
+
+{% block table_rows %}
+  {% for inscripcion in object_list %}
+  <tr class="tbl-row">
+
+    <td class="tbl-cell">
+      <div class="d-flex align-items-center gap-2">
+        <div class="alumno-avatar">
+          {{ inscripcion.alumno.first_name|first|upper }}{{ inscripcion.alumno.last_name|first|upper }}
+        </div>
+        <div>
+          <div style="font-weight:600; font-size:0.88rem; color:#1e293b;">
+            {{ inscripcion.alumno.first_name }} {{ inscripcion.alumno.last_name }}
+          </div>
+          <span class="carnet-badge">{{ inscripcion.alumno.carnet }}</span>
+        </div>
+      </div>
+    </td>
+
+    <td class="tbl-cell">
+      <span class="fecha-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        {{ inscripcion.fecha_asignacion|date:"d/m/Y" }}
+      </span>
+    </td>
+
+    <td class="tbl-cell">
+      <div class="cursos-wrap">
+        {% for asignacion in inscripcion.asignacion_curso.all %}
+          <span class="curso-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+            {{ asignacion.curso.nombre }}
+          </span>
+        {% empty %}
+          <span style="font-size:0.78rem; color:#cbd5e1;">Sin cursos</span>
+        {% endfor %}
+      </div>
+    </td>
+
+    <td class="tbl-cell">
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'inscripcion_alumno:update' inscripcion.pk %}" class="btn-edit">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Editar
+        </a>
+        <a href="{% url 'inscripcion_alumno:delete' inscripcion.pk %}" class="btn-del">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/>
+            <path d="M9 6V4h6v2"/>
+          </svg>
+          Eliminar
+        </a>
+      </div>
+    </td>
+
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="4">
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <p class="mb-1 fw-semibold text-dark" style="font-size:0.9rem;">Sin inscripciones registradas</p>
+        <p class="text-muted mb-3" style="font-size:0.82rem;">Inscribe un alumno a un curso para comenzar.</p>
+        <a href="{% url 'inscripcion_alumno:create' %}" class="btn btn-primary btn-sm">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Nueva Inscripción
+        </a>
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
 {% endblock %}

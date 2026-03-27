@@ -1,13 +1,43 @@
-{% extends 'base.html' %}
+{% extends 'partials/delete.html' %}
+
 {% block title %}Eliminar Inscripción{% endblock %}
 {% block page_title %}Confirmar Eliminación{% endblock %}
-{% block content %}
-<div class="container mt-3">
-    <p>¿Estás seguro de que deseas eliminar la inscripción del alumno <strong>{{ object.alumno }}</strong> en el curso <strong>{{ object.asignacion_curso }}</strong>?</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-        <a href="{% url 'inscripcion_alumno:list' %}" class="btn btn-secondary">Cancelar</a>
-    </form>
+{% block delete_title %}Eliminar inscripción{% endblock %}
+{% block cancel_url %}{% url 'inscripcion_alumno:list' %}{% endblock %}
+
+{% block delete_preview %}
+<div style="display:flex; align-items:center; gap:0.9rem; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:0.85rem 1rem; margin-bottom:1.25rem;">
+  <div style="width:42px; height:42px; border-radius:50%; background:#eff6ff; color:#3b82f6; font-size:0.85rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+    {{ object.alumno.first_name|first|upper }}{{ object.alumno.last_name|first|upper }}
+  </div>
+  <div>
+    <p style="font-size:0.92rem; font-weight:600; color:#1e293b; margin:0;">
+      {{ object.alumno.first_name }} {{ object.alumno.last_name }}
+    </p>
+    <p style="font-size:0.78rem; color:#94a3b8; margin:0; font-family:monospace;">
+      {{ object.alumno.carnet }}
+    </p>
+  </div>
 </div>
+
+<div class="detail-grid">
+  <div class="detail-item">
+    <label>Curso</label>
+    <span>{{ object.asignacion_curso.curso.nombre }}</span>
+  </div>
+  <div class="detail-item">
+    <label>Aula</label>
+    <span>{{ object.asignacion_curso.aula }}</span>
+  </div>
+  <div class="detail-item full">
+    <label>Horario</label>
+    <span>{{ object.asignacion_curso.horario }}</span>
+  </div>
+</div>
+{% endblock %}
+
+{% block warning_text %}
+  Se eliminará permanentemente la inscripción de
+  <strong>{{ object.alumno.first_name }} {{ object.alumno.last_name }}</strong>
+  al curso <strong>{{ object.asignacion_curso.curso.nombre }}</strong>.
 {% endblock %}
