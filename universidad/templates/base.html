@@ -283,6 +283,74 @@
         .alerts-wrapper {
             padding: 0.8rem 1.8rem 0;
         }
+
+        /* ═══════════════════════════════════════════════
+           AGREGADO: Estilos del submenú de Reportes
+        ════════════════════════════════════════════════ */
+        .nav-parent {
+            cursor: pointer;
+            user-select: none;
+        }
+        .nav-parent .arrow-icon {
+            margin-left: auto;
+            font-size: 0.72rem;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+        .nav-parent.open .arrow-icon {
+            transform: rotate(90deg);
+        }
+        body.sidebar-collapsed .nav-parent .arrow-icon {
+            display: none;
+        }
+        body.sidebar-collapsed .nav-parent {
+            position: relative;
+        }
+        body.sidebar-collapsed .nav-parent:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 54px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            white-space: nowrap;
+            z-index: 200;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .subnav {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.25s ease;
+        }
+        .subnav.open {
+            max-height: 200px;
+        }
+        body.sidebar-collapsed .subnav {
+            max-height: 0 !important;
+        }
+        .subnav .nav-link {
+            font-size: 0.82rem;
+            padding: 0.45rem 1rem 0.45rem 2.2rem;
+            margin: 1px 10px;
+            color: #64748b;
+        }
+        .subnav .nav-link i {
+            font-size: 0.85rem;
+        }
+        .subnav .nav-link.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+        }
+        .subnav .nav-link:hover {
+            background: #334155;
+            color: #e2e8f0;
+        }
+        /* ════════════════════════════════════════════════ */
     </style>
 
     {% block extra_css %}{% endblock %}
@@ -351,6 +419,35 @@
         <span class="link-text">Inscripción de Alumnos</span>
     </a>
 
+    <!-- ════════════════════════════════════════════════════
+         AGREGADO: Sección Análisis + submenú de Reportes
+    ═════════════════════════════════════════════════════ -->
+    <div class="nav-section">Análisis</div>
+
+    <div class="nav-link nav-parent {% if request.resolver_match.namespace == 'reportes' %}open{% endif %}"
+         data-tooltip="Reportes"
+         onclick="toggleSubmenu(this)">
+        <i class="bi bi-bar-chart-line-fill"></i>
+        <span class="link-text">Reportes</span>
+        <i class="bi bi-chevron-right arrow-icon"></i>
+    </div>
+
+    <div class="subnav {% if request.resolver_match.namespace == 'reportes' %}open{% endif %}">
+        <a href="{% url 'reportes:rendimiento' %}"
+           class="nav-link {% if request.resolver_match.url_name == 'rendimiento' %}active{% endif %}"
+           data-tooltip="Rendimiento Académico">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span class="link-text">Rendimiento académico</span>
+        </a>
+        <a href="{% url 'reportes:carga_academica' %}"
+           class="nav-link {% if request.resolver_match.url_name == 'carga_academica' %}active{% endif %}"
+           data-tooltip="Carga Académica">
+            <i class="bi bi-person-badge-fill"></i>
+            <span class="link-text">Carga académica</span>
+        </a>
+    </div>
+    <!-- ════════════════════════════════════════════════════ -->
+
     <div class="nav-section">Sistema</div>
     <a href="#" class="nav-link" data-tooltip="Configuración">
         <i class="bi bi-gear-fill"></i>
@@ -414,6 +511,13 @@
     function toggleSidebar() {
         const collapsed = document.body.classList.toggle('sidebar-collapsed');
         localStorage.setItem('sidebar-collapsed', collapsed);
+    }
+
+    // AGREGADO: Abre/cierra el submenú de Reportes
+    function toggleSubmenu(parentEl) {
+        const isOpen = parentEl.classList.contains('open');
+        parentEl.classList.toggle('open', !isOpen);
+        parentEl.nextElementSibling.classList.toggle('open', !isOpen);
     }
 </script>
 
