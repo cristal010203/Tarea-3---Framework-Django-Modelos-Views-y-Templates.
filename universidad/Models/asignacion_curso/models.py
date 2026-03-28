@@ -64,3 +64,8 @@ class AsignacionCurso(models.Model):
         verbose_name        = 'Asignación de Curso'
         verbose_name_plural = 'Asignaciones de Cursos'
         unique_together     = [('curso', 'alumno')]
+        indexes = [
+    models.Index(fields=['alumno'],      name='asig_alumno_idx'),
+    models.Index(fields=['catedratico'], name='asig_catedratico_idx'),
+    models.Index(fields=['curso'],       name='asig_curso_idx'),
+    ]

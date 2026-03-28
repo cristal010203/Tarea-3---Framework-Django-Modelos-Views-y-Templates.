@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+{% block title %}Reporte de Rendimiento Académico – JP University{% endblock %}
+{% block page_title %}Rendimiento Académico{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #3b82f6;
+        --success: #10b981;
+        --danger:  #ef4444;
+        --warning: #f59e0b;
+        --surface: #ffffff;
+        --muted:   #64748b;
+        --border:  #e2e8f0;
+        --radius:  12px;
+    }
+
+    .filter-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-end;
+    }
+    .filter-card .form-group { min-width: 180px; flex: 1; }
+    .filter-card label { font-size: .78rem; font-weight: 600; color: var(--muted); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: .05em; }
+    .filter-card select,
+    .filter-card input  { font-size: .88rem; border-radius: 8px; border: 1px solid var(--border); padding: .45rem .8rem; width: 100%; color: #1e293b; }
+    .filter-card select:focus,
+    .filter-card input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
+
+    .kpi-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .kpi-card  { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.3rem; display: flex; align-items: center; gap: 14px; }
+    .kpi-icon  { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .kpi-icon.blue  { background: #eff6ff; color: var(--primary); }
+    .kpi-icon.green { background: #ecfdf5; color: var(--success); }
+    .kpi-icon.red   { background: #fef2f2; color: var(--danger);  }
+    .kpi-icon.amber { background: #fffbeb; color: var(--warning);  }
+    .kpi-label { font-size: .73rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+    .kpi-value { font-size: 1.55rem; font-weight: 700; color: #1e293b; line-height: 1.1; }
+
+    .report-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .report-card-header { padding: 1rem 1.4rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .6rem; }
+    .report-card-header h6 { margin: 0; font-size: .93rem; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px; }
+    .report-card-header h6 i { color: var(--primary); }
+
+    .table-responsive { overflow-x: auto; }
+    table.rep-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    table.rep-table thead tr { background: #f8fafc; }
+    table.rep-table th { padding: .75rem 1rem; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 2px solid var(--border); white-space: nowrap; }
+    table.rep-table td { padding: .75rem 1rem; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+    table.rep-table tbody tr:hover { background: #f8fafc; }
+    table.rep-table tbody tr:last-child td { border-bottom: none; }
+
+    .alumno-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; font-size: .75rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; margin-right: 8px; flex-shrink: 0; }
+
+    .score-bar-wrap { min-width: 110px; }
+    .score-bar-track { height: 6px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-top: 4px; }
+    .score-bar-fill  { height: 100%; border-radius: 99px; }
+    .score-val { font-weight: 700; font-size: .9rem; }
+
+    .badge-estado    { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 99px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
+    .badge-aprobado  { background: #ecfdf5; color: #065f46; }
+    .badge-reprobado { background: #fef2f2; color: #991b1b; }
+    .badge-sin-notas { background: #f1f5f9; color: #475569; }
+
+    .pill-cursos { display: inline-flex; align-items: center; background: #eff6ff; color: var(--primary); border-radius: 99px; padding: 2px 10px; font-size: .75rem; font-weight: 600; }
+
+    /* ── Paginación ──────────────────────────────────────── */
+    .pagination-wrap {
+        padding: .9rem 1.4rem;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+    .pagination-info { font-size: .8rem; color: var(--muted); }
+    .pagination { margin: 0; }
+    .page-link { font-size: .82rem; color: var(--primary); border-color: var(--border); }
+    .page-item.active .page-link { background: var(--primary); border-color: var(--primary); }
+    .page-item.disabled .page-link { color: #cbd5e1; }
+
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+    .empty-state i { font-size: 2.5rem; margin-bottom: .8rem; opacity: .4; }
+
+    @media print {
+        #sidebar, #topbar, .filter-card, .btn-print, .pagination-wrap { display: none !important; }
+        #main-content { margin-left: 0 !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Filtros -->
+<form method="get" class="filter-card">
+    <div class="form-group">
+        <label>Curso</label>
+        <select name="curso">
+            <option value="">Todos los cursos</option>
+            {% for c in cursos_disponibles %}
+            <option value="{{ c.id }}" {% if filtro_curso == c.id|stringformat:"s" %}selected{% endif %}>
+                {{ c.nombre }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Estado</label>
+        <select name="estado">
+            <option value="">Todos</option>
+            <option value="aprobado"  {% if filtro_estado == 'aprobado' %}selected{% endif %}>Aprobado</option>
+            <option value="reprobado" {% if filtro_estado == 'reprobado' %}selected{% endif %}>Reprobado</option>
+            <option value="sin_notas" {% if filtro_estado == 'sin_notas' %}selected{% endif %}>Sin notas</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Buscar alumno</label>
+        <input type="text" name="q" value="{{ filtro_q }}" placeholder="Nombre o carné…">
+    </div>
+
+    <div style="display:flex;gap:.5rem;align-self:flex-end;">
+        <button type="submit" class="btn btn-primary btn-sm px-3">
+            <i class="bi bi-funnel-fill me-1"></i>Filtrar
+        </button>
+        <a href="{% url 'reportes:rendimiento' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-x-lg"></i>
+        </a>
+    </div>
+</form>
+
+<!-- KPIs (sobre el total filtrado, no solo la página actual) -->
+<div class="kpi-strip">
+    <div class="kpi-card">
+        <div class="kpi-icon blue"><i class="bi bi-people-fill"></i></div>
+        <div>
+            <div class="kpi-label">Total alumnos</div>
+            <div class="kpi-value">{{ kpi.total }}</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon green"><i class="bi bi-patch-check-fill"></i></div>
+        <div>
+            <div class="kpi-label">Aprobados</div>
+            <div class="kpi-value">{{ kpi.aprobados }}</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon red"><i class="bi bi-x-circle-fill"></i></div>
+        <div>
+            <div class="kpi-label">Reprobados</div>
+            <div class="kpi-value">{{ kpi.reprobados }}</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon amber"><i class="bi bi-bar-chart-fill"></i></div>
+        <div>
+            <div class="kpi-label">Promedio gral.</div>
+            <div class="kpi-value">{{ kpi.promedio_general }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla -->
+<div class="report-card">
+    <div class="report-card-header">
+        <h6>
+            <i class="bi bi-table"></i>
+            Detalle por alumno
+            <span style="font-weight:400;color:var(--muted);font-size:.8rem;">
+                — página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+        </h6>
+        <button class="btn btn-outline-secondary btn-sm btn-print" onclick="window.print()">
+            <i class="bi bi-printer-fill me-1"></i>Imprimir
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        {% if alumnos_data %}
+        <table class="rep-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Alumno</th>
+                    <th>Carné</th>
+                    <th>Cursos asignados</th>
+                    <th>Notas registradas</th>
+                    <th>Promedio</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in alumnos_data %}
+                <tr>
+                    <!-- Número global considerando la página -->
+                    <td style="color:var(--muted);font-size:.8rem;">
+                        {{ page_obj.start_index|add:forloop.counter0 }}
+                    </td>
+
+                    <td>
+                        <div style="display:flex;align-items:center;">
+                            <span class="alumno-avatar">
+                                {{ row.alumno.first_name|slice:":1"|upper }}{{ row.alumno.last_name|slice:":1"|upper }}
+                            </span>
+                            <div>
+                                <div style="font-weight:600;color:#1e293b;">
+                                    {{ row.alumno.first_name }} {{ row.alumno.last_name }}
+                                </div>
+                                <div style="font-size:.75rem;color:var(--muted);">{{ row.alumno.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td style="font-family:monospace;font-size:.85rem;">{{ row.alumno.carnet|default:"–" }}</td>
+
+                    <td>
+                        <span class="pill-cursos">
+                            <i class="bi bi-journal-bookmark-fill me-1"></i>{{ row.total_cursos }}
+                        </span>
+                    </td>
+
+                    <td style="color:var(--muted);">{{ row.total_notas }}</td>
+
+                    <td>
+                        <div class="score-bar-wrap">
+                            {% if row.promedio is not None %}
+                                <span class="score-val"
+                                      style="color:{% if row.promedio >= 61 %}var(--success){% else %}var(--danger){% endif %}">
+                                    {{ row.promedio }}
+                                </span>
+                                <div class="score-bar-track">
+                                    <div class="score-bar-fill"
+                                         style="width:{{ row.promedio }}%;
+                                                background:{% if row.promedio >= 61 %}var(--success){% else %}var(--danger){% endif %};">
+                                    </div>
+                                </div>
+                            {% else %}
+                                <span style="color:var(--muted);font-size:.8rem;">Sin notas</span>
+                            {% endif %}
+                        </div>
+                    </td>
+
+                    <td>
+                        {% if row.estado == 'sin_notas' %}
+                            <span class="badge-estado badge-sin-notas"><i class="bi bi-dash-circle"></i> Sin notas</span>
+                        {% elif row.estado == 'aprobado' %}
+                            <span class="badge-estado badge-aprobado"><i class="bi bi-check-circle-fill"></i> Aprobado</span>
+                        {% else %}
+                            <span class="badge-estado badge-reprobado"><i class="bi bi-x-circle-fill"></i> Reprobado</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox d-block"></i>
+            No se encontraron alumnos con los filtros aplicados.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Paginación -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pagination-wrap">
+        <span class="pagination-info">
+            Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }}
+            de {{ page_obj.paginator.count }} alumnos
+        </span>
+
+        <nav>
+            <ul class="pagination pagination-sm">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1&curso={{ filtro_curso }}&estado={{ filtro_estado }}&q={{ filtro_q }}">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&curso={{ filtro_curso }}&estado={{ filtro_estado }}&q={{ filtro_q }}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Mostrar máximo 5 páginas alrededor de la actual -->
+                {% for i in page_obj.paginator.page_range %}
+                    {% if i >= page_obj.number|add:"-2" and i <= page_obj.number|add:"2" %}
+                    <li class="page-item {% if i == page_obj.number %}active{% endif %}">
+                        <a class="page-link" href="?page={{ i }}&curso={{ filtro_curso }}&estado={{ filtro_estado }}&q={{ filtro_q }}">
+                            {{ i }}
+                        </a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&curso={{ filtro_curso }}&estado={{ filtro_estado }}&q={{ filtro_q }}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&curso={{ filtro_curso }}&estado={{ filtro_estado }}&q={{ filtro_q }}">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

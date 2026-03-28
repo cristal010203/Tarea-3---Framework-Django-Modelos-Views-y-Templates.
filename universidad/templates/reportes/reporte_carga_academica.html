@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+{% block title %}Reporte de Carga Académica – JP University{% endblock %}
+{% block page_title %}Carga Académica de Catedráticos{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #3b82f6;
+        --success: #10b981;
+        --danger:  #ef4444;
+        --warning: #f59e0b;
+        --indigo:  #6366f1;
+        --surface: #ffffff;
+        --muted:   #64748b;
+        --border:  #e2e8f0;
+        --radius:  12px;
+    }
+
+    .filter-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;
+    }
+    .filter-card .form-group { min-width: 180px; flex: 1; }
+    .filter-card label { font-size: .78rem; font-weight: 600; color: var(--muted); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: .05em; }
+    .filter-card select,
+    .filter-card input  { font-size: .88rem; border-radius: 8px; border: 1px solid var(--border); padding: .45rem .8rem; width: 100%; color: #1e293b; }
+    .filter-card select:focus,
+    .filter-card input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
+
+    .kpi-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .kpi-card  { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.3rem; display: flex; align-items: center; gap: 14px; }
+    .kpi-icon  { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .kpi-icon.blue   { background: #eff6ff; color: var(--primary); }
+    .kpi-icon.indigo { background: #eef2ff; color: var(--indigo);  }
+    .kpi-icon.green  { background: #ecfdf5; color: var(--success); }
+    .kpi-icon.amber  { background: #fffbeb; color: var(--warning);  }
+    .kpi-label { font-size: .73rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+    .kpi-value { font-size: 1.55rem; font-weight: 700; color: #1e293b; line-height: 1.1; }
+
+    /* Cards catedráticos */
+    .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.1rem; }
+    .cat-card  { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+
+    .cat-card-head { padding: 1.1rem 1.3rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .cat-avatar {
+        width: 44px; height: 44px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--indigo), var(--primary));
+        color: #fff; font-size: .95rem; font-weight: 700;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; letter-spacing: .05em;
+    }
+    .cat-name  { font-size: .95rem; font-weight: 700; color: #1e293b; }
+    .cat-email { font-size: .75rem; color: var(--muted); margin-top: 1px; }
+    .cat-esp   { font-size: .72rem; color: var(--indigo); font-weight: 600; margin-top: 2px; }
+
+    .cat-stats { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+    .cat-stat  { flex: 1; text-align: center; padding: .7rem .5rem; border-right: 1px solid var(--border); }
+    .cat-stat:last-child { border-right: none; }
+    .cat-stat-val { font-size: 1.2rem; font-weight: 700; color: #1e293b; }
+    .cat-stat-lbl { font-size: .68rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+
+    .cat-courses { padding: .2rem 0; }
+    .course-row  { display: flex; align-items: center; justify-content: space-between; padding: .55rem 1.1rem; border-bottom: 1px solid #f1f5f9; gap: 8px; flex-wrap: wrap; }
+    .course-row:last-child { border-bottom: none; }
+    .course-name { font-size: .85rem; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 7px; }
+    .course-name i { color: var(--primary); font-size: .9rem; }
+    .course-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .chip        { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 99px; font-size: .72rem; font-weight: 600; white-space: nowrap; }
+    .chip-indigo { background: #eef2ff; color: #4338ca; }
+
+    .course-score   { display: flex; align-items: center; gap: 6px; min-width: 90px; }
+    .mini-bar-track { flex: 1; height: 5px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+    .mini-bar-fill  { height: 100%; border-radius: 99px; }
+    .mini-score     { font-size: .78rem; font-weight: 700; min-width: 30px; text-align: right; }
+
+    /* Vista tabla alternativa */
+    .view-toggle { display: flex; gap: 6px; }
+    .view-btn { background: none; border: 1px solid var(--border); border-radius: 7px; padding: 5px 10px; cursor: pointer; color: var(--muted); font-size: .88rem; transition: all .15s; }
+    .view-btn.active, .view-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+    .report-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .table-responsive { overflow-x: auto; }
+    table.rep-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    table.rep-table thead tr { background: #f8fafc; }
+    table.rep-table th { padding: .75rem 1rem; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 2px solid var(--border); white-space: nowrap; }
+    table.rep-table td { padding: .75rem 1rem; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+    table.rep-table tbody tr:hover { background: #f8fafc; }
+    table.rep-table tbody tr:last-child td { border-bottom: none; }
+
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+    .empty-state i { font-size: 2.5rem; margin-bottom: .8rem; opacity: .4; }
+
+    @media print {
+        #sidebar, #topbar, .filter-card, .view-toggle, .btn-print { display: none !important; }
+        #main-content { margin-left: 0 !important; }
+        .cat-card { break-inside: avoid; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Filtros -->
+<form method="get" class="filter-card">
+    <div class="form-group">
+        <label>Catedrático</label>
+        <select name="catedratico">
+            <option value="">Todos</option>
+            {% for cat in catedraticos_disponibles %}
+            <option value="{{ cat.id }}" {% if filtro_catedratico == cat.id|stringformat:"s" %}selected{% endif %}>
+                {{ cat.first_name }} {{ cat.last_name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Buscar</label>
+        <input type="text" name="q" value="{{ filtro_q }}" placeholder="Nombre del catedrático…">
+    </div>
+
+    <div style="display:flex;gap:.5rem;align-self:flex-end;">
+        <button type="submit" class="btn btn-primary btn-sm px-3">
+            <i class="bi bi-funnel-fill me-1"></i>Filtrar
+        </button>
+        <a href="{% url 'reportes:carga_academica' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-x-lg"></i>
+        </a>
+        <button type="button" class="btn btn-outline-secondary btn-sm btn-print" onclick="window.print()">
+            <i class="bi bi-printer-fill me-1"></i>Imprimir
+        </button>
+    </div>
+</form>
+
+<!-- KPIs -->
+<div class="kpi-strip">
+    <div class="kpi-card">
+        <div class="kpi-icon indigo"><i class="bi bi-person-badge-fill"></i></div>
+        <div>
+            <div class="kpi-label">Catedráticos</div>
+            <div class="kpi-value">{{ kpi.total_catedraticos }}</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon blue"><i class="bi bi-journal-bookmark-fill"></i></div>
+        <div>
+            <div class="kpi-label">Cursos activos</div>
+            <div class="kpi-value">{{ kpi.total_asignaciones }}</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon green"><i class="bi bi-people-fill"></i></div>
+        <div>
+            <div class="kpi-label">Alumnos totales</div>
+            <div class="kpi-value">{{ kpi.total_alumnos }}</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon amber"><i class="bi bi-bar-chart-fill"></i></div>
+        <div>
+            <div class="kpi-label">Prom. alumnos/cat.</div>
+            <div class="kpi-value">{{ kpi.promedio_alumnos_por_catedratico|floatformat:1 }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Selector de vista -->
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+    <span style="font-size:.85rem;color:var(--muted);font-weight:600;">
+        {{ catedraticos_data|length }} catedrático{{ catedraticos_data|length|pluralize }} encontrado{{ catedraticos_data|length|pluralize }}
+    </span>
+    <div class="view-toggle">
+        <button class="view-btn active" id="btn-cards" onclick="setView('cards')" title="Vista tarjetas">
+            <i class="bi bi-grid-3x3-gap-fill"></i>
+        </button>
+        <button class="view-btn" id="btn-table" onclick="setView('table')" title="Vista tabla">
+            <i class="bi bi-table"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Vista Tarjetas -->
+<div id="view-cards">
+    {% if catedraticos_data %}
+    <div class="cat-grid">
+        {% for row in catedraticos_data %}
+        <div class="cat-card">
+
+            <div class="cat-card-head">
+                <div class="cat-avatar">
+                    {{ row.catedratico.first_name|slice:":1"|upper }}{{ row.catedratico.last_name|slice:":1"|upper }}
+                </div>
+                <div>
+                    <div class="cat-name">{{ row.catedratico.first_name }} {{ row.catedratico.last_name }}</div>
+                    <div class="cat-email">{{ row.catedratico.email }}</div>
+                    {% if row.catedratico.especialidad %}
+                    <div class="cat-esp"><i class="bi bi-mortarboard-fill me-1"></i>{{ row.catedratico.especialidad }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="cat-stats">
+                <div class="cat-stat">
+                    <div class="cat-stat-val" style="color:var(--primary);">{{ row.total_cursos }}</div>
+                    <div class="cat-stat-lbl">Cursos</div>
+                </div>
+                <div class="cat-stat">
+                    <div class="cat-stat-val" style="color:var(--success);">{{ row.total_alumnos }}</div>
+                    <div class="cat-stat-lbl">Alumnos</div>
+                </div>
+                <div class="cat-stat">
+                    {% if row.promedio_general is not None %}
+                    <div class="cat-stat-val" style="color:{% if row.promedio_general >= 61 %}var(--success){% else %}var(--danger){% endif %};">
+                        {{ row.promedio_general|floatformat:1 }}
+                    </div>
+                    {% else %}
+                    <div class="cat-stat-val" style="color:var(--muted);">–</div>
+                    {% endif %}
+                    <div class="cat-stat-lbl">Promedio</div>
+                </div>
+            </div>
+
+            <div class="cat-courses">
+                {% for curso in row.cursos %}
+                <div class="course-row">
+                    <div class="course-name">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                        {{ curso.nombre }}
+                    </div>
+                    <div class="course-meta">
+                        <span class="chip chip-indigo">
+                            <i class="bi bi-people-fill"></i> {{ curso.alumnos_inscritos }}
+                        </span>
+                        {% if curso.promedio is not None %}
+                        <div class="course-score">
+                            <div class="mini-bar-track">
+                                <div class="mini-bar-fill"
+                                     style="width:{{ curso.promedio|floatformat:0 }}%;
+                                            background:{% if curso.promedio >= 61 %}var(--success){% else %}var(--danger){% endif %};">
+                                </div>
+                            </div>
+                            <span class="mini-score"
+                                  style="color:{% if curso.promedio >= 61 %}var(--success){% else %}var(--danger){% endif %};">
+                                {{ curso.promedio|floatformat:1 }}
+                            </span>
+                        </div>
+                        {% else %}
+                        <span class="chip" style="background:#f1f5f9;color:var(--muted);">Sin notas</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div style="padding:.8rem 1.1rem;font-size:.82rem;color:var(--muted);">
+                    Sin cursos asignados.
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="report-card">
+        <div class="empty-state">
+            <i class="bi bi-inbox d-block"></i>
+            No se encontraron catedráticos con los filtros aplicados.
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Vista Tabla -->
+<div id="view-table" style="display:none;">
+    <div class="report-card">
+        <div class="table-responsive">
+            {% if catedraticos_data %}
+            <table class="rep-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Catedrático</th>
+                        <th>Especialidad</th>
+                        <th>Curso</th>
+                        <th>Alumnos inscritos</th>
+                        <th>Promedio del curso</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in catedraticos_data %}
+                        {% for curso in row.cursos %}
+                        <tr>
+                            {% if forloop.first %}
+                            <td rowspan="{{ row.cursos|length }}" style="color:var(--muted);font-size:.8rem;">
+                                {{ forloop.parentloop.counter }}
+                            </td>
+                            <td rowspan="{{ row.cursos|length }}">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <div class="cat-avatar" style="width:30px;height:30px;font-size:.7rem;">
+                                        {{ row.catedratico.first_name|slice:":1"|upper }}{{ row.catedratico.last_name|slice:":1"|upper }}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600;color:#1e293b;">
+                                            {{ row.catedratico.first_name }} {{ row.catedratico.last_name }}
+                                        </div>
+                                        <div style="font-size:.73rem;color:var(--muted);">
+                                            {{ row.total_cursos }} curso{{ row.total_cursos|pluralize }} · {{ row.total_alumnos }} alumno{{ row.total_alumnos|pluralize }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td rowspan="{{ row.cursos|length }}" style="font-size:.8rem;color:var(--indigo);">
+                                {{ row.catedratico.especialidad|default:"–" }}
+                            </td>
+                            {% endif %}
+                            <td><span style="font-weight:600;color:#334155;">{{ curso.nombre }}</span></td>
+                            <td>
+                                <span class="chip chip-indigo">
+                                    <i class="bi bi-people-fill me-1"></i>{{ curso.alumnos_inscritos }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if curso.promedio is not None %}
+                                <span style="font-weight:700;color:{% if curso.promedio >= 61 %}var(--success){% else %}var(--danger){% endif %};">
+                                    {{ curso.promedio|floatformat:1 }}
+                                </span>
+                                {% else %}
+                                <span style="color:var(--muted);font-size:.8rem;">Sin notas</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-inbox d-block"></i>
+                No se encontraron datos.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function setView(v) {
+        document.getElementById('view-cards').style.display = v === 'cards' ? '' : 'none';
+        document.getElementById('view-table').style.display = v === 'table' ? '' : 'none';
+        document.getElementById('btn-cards').classList.toggle('active', v === 'cards');
+        document.getElementById('btn-table').classList.toggle('active', v === 'table');
+        localStorage.setItem('carga-view', v);
+    }
+    (function() {
+        const saved = localStorage.getItem('carga-view');
+        if (saved === 'table') setView('table');
+    })();
+</script>
+{% endblock %}

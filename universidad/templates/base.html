@@ -31,14 +31,19 @@
             left: 0;
             height: 100%;
             z-index: 100;
-            
             transition: width 0.25s ease;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #334155 transparent;
         }
+        #sidebar::-webkit-scrollbar       { width: 4px; }
+        #sidebar::-webkit-scrollbar-track { background: transparent; }
+        #sidebar::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
 
-        
         body.sidebar-collapsed #sidebar {
             width: 64px;
+            overflow-y: hidden;
         }
 
         #sidebar .sidebar-brand {
@@ -50,21 +55,21 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            
             white-space: nowrap;
+            position: sticky;
+            top: 0;
+            background: #1e293b;
+            z-index: 1;
+            flex-shrink: 0;
         }
 
         #sidebar .sidebar-brand i {
             color: #3b82f6;
             font-size: 1.4rem;
-           
             flex-shrink: 0;
         }
 
-        
-        body.sidebar-collapsed #sidebar .sidebar-brand .brand-text {
-            opacity: 0;
-        }
+        body.sidebar-collapsed #sidebar .sidebar-brand .brand-text { opacity: 0; }
 
         #sidebar .nav-section {
             padding: 1rem 1rem 0.3rem;
@@ -73,15 +78,12 @@
             letter-spacing: 0.08em;
             color: #64748b;
             font-weight: 600;
-            
             white-space: nowrap;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
-        
-        body.sidebar-collapsed #sidebar .nav-section {
-            opacity: 0;
-        }
+        body.sidebar-collapsed #sidebar .nav-section { opacity: 0; }
 
         #sidebar .nav-link {
             color: #94a3b8;
@@ -94,27 +96,20 @@
             font-size: 0.9rem;
             transition: all 0.2s;
             text-decoration: none;
-          
             white-space: nowrap;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         #sidebar .nav-link i {
             font-size: 1.05rem;
             width: 20px;
             text-align: center;
-            
             flex-shrink: 0;
         }
 
-        
-        body.sidebar-collapsed #sidebar .nav-link .link-text {
-            opacity: 0;
-            width: 0;
-            overflow: hidden;
-        }
+        body.sidebar-collapsed #sidebar .nav-link .link-text { opacity: 0; width: 0; overflow: hidden; }
 
-        
         body.sidebar-collapsed #sidebar .nav-link {
             justify-content: center;
             padding: 0.55rem;
@@ -122,7 +117,6 @@
             position: relative;
         }
 
-        
         body.sidebar-collapsed #sidebar .nav-link:hover::after {
             content: attr(data-tooltip);
             position: absolute;
@@ -140,23 +134,18 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        #sidebar .nav-link:hover {
-            background: #334155;
-            color: #e2e8f0;
+        #sidebar .nav-link:hover  { background: #334155; color: #e2e8f0; }
+        #sidebar .nav-link.active { background: #3b82f6; color: #fff; }
+
+        /* ── Empuja Sistema/Footer al fondo ─────────────── */
+        .sidebar-spacer {
+            flex: 1;
+            min-height: 1.5rem;  /* espacio mínimo visible entre Reportes y Sistema */
         }
 
-        #sidebar .nav-link.active {
-            background: #3b82f6;
-            color: #fff;
-        }
-
-        
-        body.sidebar-collapsed #sidebar .sidebar-footer {
-            opacity: 0;
-        }
+        body.sidebar-collapsed #sidebar .sidebar-footer { opacity: 0; }
 
         #sidebar .sidebar-footer {
-            margin-top: auto;
             padding: 1rem;
             border-top: 1px solid #334155;
             font-size: 0.78rem;
@@ -164,9 +153,9 @@
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
-        
         #sidebar-toggle {
             position: absolute;
             bottom: 60px;
@@ -184,21 +173,14 @@
             transition: background 0.2s, color 0.2s;
         }
 
-        #sidebar-toggle:hover {
-            background: #3b82f6;
-            color: #fff;
-        }
+        #sidebar-toggle:hover { background: #3b82f6; color: #fff; }
 
-        
         body.sidebar-collapsed #sidebar-toggle {
             right: 50%;
             transform: translateX(50%);
         }
 
-       
-        body.sidebar-collapsed #sidebar-toggle i {
-            transform: rotate(180deg);
-        }
+        body.sidebar-collapsed #sidebar-toggle i { transform: rotate(180deg); }
 
         #main-content {
             margin-left: 240px;
@@ -206,13 +188,10 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-           
             transition: margin-left 0.25s ease;
         }
 
-        body.sidebar-collapsed #main-content {
-            margin-left: 64px;
-        }
+        body.sidebar-collapsed #main-content { margin-left: 64px; }
 
         #topbar {
             background: #fff;
@@ -226,14 +205,8 @@
             z-index: 99;
         }
 
-    
-        #topbar .topbar-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        #topbar .topbar-left { display: flex; align-items: center; gap: 12px; }
 
-        
         #topbar-toggle {
             background: none;
             border: none;
@@ -246,66 +219,31 @@
             transition: background 0.2s, color 0.2s;
         }
 
-        #topbar-toggle:hover {
-            background: #f1f5f9;
-            color: #1e293b;
-        }
+        #topbar-toggle:hover { background: #f1f5f9; color: #1e293b; }
 
-        #topbar .page-heading {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin: 0;
-        }
+        #topbar .page-heading { font-size: 1rem; font-weight: 600; color: #1e293b; margin: 0; }
+        #topbar .topbar-right { display: flex; align-items: center; gap: 12px; }
+        #topbar .topbar-right .user-name { font-size: 0.85rem; color: #64748b; }
+        #topbar .topbar-right img { width: 34px; height: 34px; border-radius: 50%; }
 
-        #topbar .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .page-wrapper { padding: 1.8rem; flex: 1; }
+        .alerts-wrapper { padding: 0.8rem 1.8rem 0; }
 
-        #topbar .topbar-right .user-name {
-            font-size: 0.85rem;
-            color: #64748b;
-        }
+        /* ══════════════════════════════════════
+           Submenú de Reportes
+        ══════════════════════════════════════ */
+        .nav-parent { cursor: pointer; user-select: none; }
 
-        #topbar .topbar-right img {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-        }
-
-        .page-wrapper {
-            padding: 1.8rem;
-            flex: 1;
-        }
-
-        .alerts-wrapper {
-            padding: 0.8rem 1.8rem 0;
-        }
-
-        /* ═══════════════════════════════════════════════
-           AGREGADO: Estilos del submenú de Reportes
-        ════════════════════════════════════════════════ */
-        .nav-parent {
-            cursor: pointer;
-            user-select: none;
-        }
         .nav-parent .arrow-icon {
             margin-left: auto;
             font-size: 0.72rem;
             transition: transform 0.2s;
             flex-shrink: 0;
         }
-        .nav-parent.open .arrow-icon {
-            transform: rotate(90deg);
-        }
-        body.sidebar-collapsed .nav-parent .arrow-icon {
-            display: none;
-        }
-        body.sidebar-collapsed .nav-parent {
-            position: relative;
-        }
+        .nav-parent.open .arrow-icon { transform: rotate(90deg); }
+
+        body.sidebar-collapsed .nav-parent .arrow-icon { display: none; }
+        body.sidebar-collapsed .nav-parent { position: relative; }
         body.sidebar-collapsed .nav-parent:hover::after {
             content: attr(data-tooltip);
             position: absolute;
@@ -322,35 +260,32 @@
             border: 1px solid #334155;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
+
         .subnav {
             overflow: hidden;
             max-height: 0;
-            transition: max-height 0.25s ease;
+            transition: max-height 0.3s ease;
+            border-left: 2px solid #334155;
+            margin-left: 20px;
+            margin-right: 10px;
+            flex-shrink: 0;
         }
-        .subnav.open {
-            max-height: 200px;
-        }
-        body.sidebar-collapsed .subnav {
-            max-height: 0 !important;
-        }
+        .subnav.open { max-height: 500px; }
+        body.sidebar-collapsed .subnav { max-height: 0 !important; }
+
         .subnav .nav-link {
             font-size: 0.82rem;
-            padding: 0.45rem 1rem 0.45rem 2.2rem;
-            margin: 1px 10px;
+            padding: 0.5rem 1rem 0.5rem 1.2rem;
+            margin: 2px 0;
             color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            border-radius: 6px;
         }
-        .subnav .nav-link i {
-            font-size: 0.85rem;
-        }
-        .subnav .nav-link.active {
-            background: rgba(59, 130, 246, 0.15);
-            color: #93c5fd;
-        }
-        .subnav .nav-link:hover {
-            background: #334155;
-            color: #e2e8f0;
-        }
-        /* ════════════════════════════════════════════════ */
+        .subnav .nav-link i { font-size: 0.85rem; }
+        .subnav .nav-link.active { background: rgba(59,130,246,0.15); color: #93c5fd; }
+        .subnav .nav-link:hover  { background: #334155; color: #e2e8f0; }
+        /* ══════════════════════════════════════ */
     </style>
 
     {% block extra_css %}{% endblock %}
@@ -361,12 +296,10 @@
 
     <div class="sidebar-brand">
         <i class="bi bi-mortarboard-fill"></i>
-        
         <span class="brand-text">JP University</span>
     </div>
 
     <div class="nav-section">Principal</div>
-
 
     <a href="{% url 'dashboard' %}"
        class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
@@ -419,9 +352,6 @@
         <span class="link-text">Inscripción de Alumnos</span>
     </a>
 
-    <!-- ════════════════════════════════════════════════════
-         AGREGADO: Sección Análisis + submenú de Reportes
-    ═════════════════════════════════════════════════════ -->
     <div class="nav-section">Análisis</div>
 
     <div class="nav-link nav-parent {% if request.resolver_match.namespace == 'reportes' %}open{% endif %}"
@@ -446,7 +376,9 @@
             <span class="link-text">Carga académica</span>
         </a>
     </div>
-    <!-- ════════════════════════════════════════════════════ -->
+
+    <!-- Espaciador: empuja todo lo de abajo al fondo -->
+    <div class="sidebar-spacer"></div>
 
     <div class="nav-section">Sistema</div>
     <a href="#" class="nav-link" data-tooltip="Configuración">
@@ -513,7 +445,7 @@
         localStorage.setItem('sidebar-collapsed', collapsed);
     }
 
-    // AGREGADO: Abre/cierra el submenú de Reportes
+    // Abre/cierra el submenú
     function toggleSubmenu(parentEl) {
         const isOpen = parentEl.classList.contains('open');
         parentEl.classList.toggle('open', !isOpen);

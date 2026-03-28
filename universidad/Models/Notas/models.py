@@ -12,4 +12,9 @@ class Nota(models.Model):
 
     class Meta:
         db_table = 'nota'
+        indexes = [
+    models.Index(fields=['alumno'],        name='nota_alumno_idx'),
+    models.Index(fields=['curso'],         name='nota_curso_idx'),
+    models.Index(fields=['alumno', 'curso'], name='nota_alumno_curso_idx'),
+    ]
 

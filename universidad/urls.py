@@ -31,5 +31,6 @@ path('', views.dashboard, name='dashboard'),
     path('notas/', include('universidad.Models.Notas.urls')),
     path('asignacion_curso/', include('universidad.Models.asignacion_curso.urls')),
     path('inscripcion_alumno/', include('universidad.Models.Inscripcion_alumno.urls')),
-    path('reportes/', include('universidad.Models.reportes.urls'))
+    path('reportes/', include(('universidad.Models.reportes.urls', 'reportes'), namespace='reportes')),
+
 ]

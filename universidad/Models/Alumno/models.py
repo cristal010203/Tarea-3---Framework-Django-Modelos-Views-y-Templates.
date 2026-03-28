@@ -26,3 +26,7 @@ class Alumno(models.Model):
         ordering            = ['last_name', 'first_name']
         verbose_name        = 'Alumno'
         verbose_name_plural = 'Alumnos'
+        indexes = [ models.Index(fields=['last_name', 'first_name'], name='alumno_nombre_idx'),
+                    models.Index(fields=['is_active'],               name='alumno_activo_idx'), 
+                    models.Index(fields=['carnet'],                  name='alumno_carnet_idx'),
+                    ]
